@@ -5,6 +5,8 @@ import '@murrayju/config';
 
 import logger from './logger';
 import AppServer from './AppServer';
+import * as mongo from './mongo';
+import { startScraperCron } from './scraper/cron';
 
 // Top level event logging
 process.on('exit', code => logger.info(`Process exiting with code: ${code}`));
@@ -39,33 +41,39 @@ process.on('rejectionHandled', promise => {
   });
 });
 
-// Was run as app entry point, start the server
-const server = new AppServer();
-server
-  .init()
-  .then(() => {
-    if (server.connection) {
-      server.connection.on('close', () => {
-        logger.info('Server disconnected.');
-      });
-      if (server.port != null) {
-        const msg = `Listening on port ${server.port}...`;
-        logger.info(msg);
-        // tests depend on this output to always indicate that the server is up and ready
-        console.info(msg);
+mongo.init().then(() => startApp());
 
-        // Listen for kill signal from nodemon
-        const killSig = process.env.NODEMON_KILL_SIG;
-        if (killSig) {
-          process.once(killSig, () => {
-            process.kill(process.pid, killSig);
-          });
+const startApp = () => {
+  // Was run as app entry point, start the server
+  const server = new AppServer();
+  server
+    .init()
+    .then(() => {
+      if (server.connection) {
+        server.connection.on('close', () => {
+          logger.info('Server disconnected.');
+        });
+        if (server.port != null) {
+          const msg = `Listening on port ${server.port}...`;
+          logger.info(msg);
+          // tests depend on this output to always indicate that the server is up and ready
+          console.info(msg);
+
+          // Listen for kill signal from nodemon
+          const killSig = process.env.NODEMON_KILL_SIG;
+          if (killSig) {
+            process.once(killSig, () => {
+              process.kill(process.pid, killSig);
+            });
+          }
         }
       }
-    }
-  })
-  .catch(err => {
-    console.error(err);
-    logger.error('Failed to initialize the server.', err);
-    process.exit(-1);
-  });
+    })
+    .catch(err => {
+      console.error(err);
+      logger.error('Failed to initialize the server.', err);
+      process.exit(-1);
+    });
+};
+
+startScraperCron();

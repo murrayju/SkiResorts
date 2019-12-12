@@ -181,14 +181,14 @@ export async function dockerTeardown() {
 export async function runDbContainer(
   network: ?string = 'ski-resorts',
   persist: ?string = './db/data',
-  port: ?number = 27017,
+  port: ?number = 27018,
   alias: ?string = 'db',
 ) {
   const dc = yaml.safeLoad(await fs.readFile('./docker-compose.yml'));
   const { image } = dc.services.db;
   const p = port && (await getPort({ port, host }));
   buildLog('Starting database server...');
-  const dockerPort = 28015;
+  const dockerPort = 27017;
   const id = await dockerPullAndRunContainer(image, {
     runArgs: [
       ...(persist ? ['-v', `${path.resolve(persist)}:/data/db:rw`] : []),

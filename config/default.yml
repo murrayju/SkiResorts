@@ -1,3 +1,6 @@
 ---
 server:
   port: 8002
+db:
+  url: mongodb://localhost:27018
+  name: skidb

@@ -36,6 +36,8 @@
     "cors": "^2.8.5",
     "express": "^4.17.1",
     "express-promise-router": "^3.0.3",
+    "mongo": "^0.1.0",
+    "mongodb": "^3.4.0",
     "node-fetch": "^2.6.0",
     "request": "^2.88.0",
     "request-promise": "^4.2.5",

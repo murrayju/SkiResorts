@@ -32,6 +32,8 @@ export default async function tdd(
   testDebug = process.argv.includes('--test-debug'),
   debugBreak = process.argv.includes('--break'),
   noDocker = process.argv.includes('--tdd-no-docker'),
+  doLint = process.argv.includes('--tdd-lint'),
+  doFlow = process.argv.includes('--tdd-flow'),
 ) {
   // Start nodemon to host server instance
   let server = null;
@@ -146,7 +148,7 @@ export default async function tdd(
       };
 
       // Run build in watch mode
-      await run(build, true, async () => {
+      await run(build, true, doLint, doFlow, async () => {
         if (cleaning) throw new Error('Aborting build, process cleaning up.');
         await run(test, true, true, undefined, extraEnv, testDebug, false);
         if (cleaning) throw new Error('Aborting build, process cleaning up.');

@@ -20,6 +20,8 @@ import generateSrc from './generateSrc';
  */
 export default async function build(
   watch = process.argv.includes('--watch'),
+  doLint = true,
+  doFlow = true,
   cbFn,
 ) {
   const noBuild =
@@ -42,8 +44,12 @@ export default async function build(
       await run(cleanDeps);
     }
     await run(deps);
-    await run(lint);
-    await run(flow);
+    if (doLint) {
+      await run(lint);
+    }
+    if (doFlow) {
+      await run(flow);
+    }
     await run(generateSrc);
 
     // actual build
@@ -107,7 +113,11 @@ export default async function build(
 
     const doBabel = async () => {
       await clean(['./build/src/**']);
-      await Promise.all([run(babelTransform), run(lint), run(flow)]);
+      await Promise.all([
+        run(babelTransform),
+        ...(doLint ? [run(lint)] : []),
+        ...(doFlow ? [run(flow)] : []),
+      ]);
     };
     const babelWatcher = createWatcher(['./src/**/*'], async () =>
       noBuild ? buildLog('Skipping babel due to --no-build') : doBabel(),

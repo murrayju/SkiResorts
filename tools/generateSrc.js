@@ -19,8 +19,5 @@ export default async function generateSrc() {
   }
 
   await fs.ensureDir('./src');
-  lintAndWrite(
-    `${await getVersionCode()}\nexport default version;`,
-    './src/version._generated_.js',
-  );
+  lintAndWrite(`${await getVersionCode()}\nexport default version;`, './src/version._generated_.js');
 }

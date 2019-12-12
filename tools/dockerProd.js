@@ -21,10 +21,7 @@ export default async function dockerProd(
 ) {
   await fs.ensureFile('./latest.build.tag');
   const tag = await getBuildTag();
-  if (
-    build ||
-    !(await dockerImages(getDockerRepo())).find(m => m.tag === tag)
-  ) {
+  if (build || !(await dockerImages(getDockerRepo())).find(m => m.tag === tag)) {
     buildLog('Image does not exist, running docker build...');
     await run(docker);
   }
@@ -43,9 +40,7 @@ export default async function dockerProd(
         try {
           await dockerNetworkDelete(network);
         } catch (err) {
-          buildLog(
-            `Failed to delete network (probably does not exist): ${err.message}`,
-          );
+          buildLog(`Failed to delete network (probably does not exist): ${err.message}`);
         }
         process.exit();
       })();
@@ -66,9 +61,7 @@ export default async function dockerProd(
     const dockerPort = 443;
     const localPort = await getPort({ port: 8443, host: '0.0.0.0' });
 
-    buildLog(
-      `Starting server, to be available at https://localhost:${localPort}`,
-    );
+    buildLog(`Starting server, to be available at https://localhost:${localPort}`);
 
     // Run the tests in the builder container
     await dockerRun(
@@ -84,14 +77,7 @@ export default async function dockerProd(
         ...(integration
           ? [
               ...(dbHost && dbPort
-                ? [
-                    '-e',
-                    'DB_ENABLED=true',
-                    '-e',
-                    `DB_HOST=${dbHost}`,
-                    '-e',
-                    `DB_PORT=${dbPort}`,
-                  ]
+                ? ['-e', 'DB_ENABLED=true', '-e', `DB_HOST=${dbHost}`, '-e', `DB_PORT=${dbPort}`]
                 : []),
               `--network=${network}`,
             ]

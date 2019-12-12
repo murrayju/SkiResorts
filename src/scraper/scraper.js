@@ -1,11 +1,12 @@
 import cheerio from 'cheerio';
-import request from 'request-promise';
+import fetch from 'node-fetch';
+import { mapValues } from 'lodash/fp';
+import { Promise } from 'bluebird';
 
 export const getData = async ({ url, selectors }) => {
-  const $ = await request({
-    uri: url,
-    transform: body => cheerio.load(body),
-  });
+  const $ = await fetch(url)
+    .then(r => r.text())
+    .then(html => cheerio.load(html));
 
   return Object.keys(selectors).reduce(
     (obj, selector) => ({
@@ -15,3 +16,5 @@ export const getData = async ({ url, selectors }) => {
     {},
   );
 };
+
+export const getResortsData = async resorts => Promise.props(mapValues(getData)(resorts));

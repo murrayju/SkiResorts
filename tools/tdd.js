@@ -1,10 +1,4 @@
-import {
-  dockerRun,
-  run,
-  onKillSignal,
-  buildLog,
-  dockerNetworkCreate,
-} from 'build-strap';
+import { dockerRun, run, onKillSignal, buildLog, dockerNetworkCreate } from 'build-strap';
 import path from 'path';
 import getPort from 'get-port';
 import fs from 'fs-extra';
@@ -12,20 +6,14 @@ import fs from 'fs-extra';
 import build from './build';
 import test from './test';
 import serve from './serve';
-import {
-  runDbContainer,
-  ensureBuilder,
-  getBuilderImage,
-  dockerTeardown,
-} from './docker';
+import { runDbContainer, ensureBuilder, getBuilderImage, dockerTeardown } from './docker';
 
 /**
  * Development mode. When files change, rebuild, test, and run
  */
 export default async function tdd(
   pauseOnCrash = process.argv.includes('--tdd-pause-on-crash'),
-  runDatabase = !process.argv.includes('--tdd-no-db') &&
-    !process.argv.includes('--tdd-no-docker'),
+  runDatabase = !process.argv.includes('--tdd-no-db') && !process.argv.includes('--tdd-no-docker'),
   persistDbData = !process.argv.includes('--tdd-no-db-persist'),
   dockerize = process.argv.includes('--tdd-docker'),
   testIntegration = process.argv.includes('--test-integration'),
@@ -67,19 +55,13 @@ export default async function tdd(
       (async () => {
         if (runDatabase) {
           await fs.ensureDir('./db/data-tdd');
-          ({ port: dbPort } = await runDbContainer(
-            network,
-            persistDbData && './db/data-tdd',
-          ));
+          ({ port: dbPort } = await runDbContainer(network, persistDbData && './db/data-tdd'));
         }
       })(),
     ];
 
     if (dockerize) {
-      const [builderTag] = await Promise.all([
-        ensureBuilder(),
-        ...containerPromises,
-      ]);
+      const [builderTag] = await Promise.all([ensureBuilder(), ...containerPromises]);
 
       const host = '0.0.0.0';
       const dockerPort = 8000;
@@ -153,14 +135,7 @@ export default async function tdd(
         await run(test, true, true, undefined, extraEnv, testDebug, false);
         if (cleaning) throw new Error('Aborting build, process cleaning up.');
         if (!server) {
-          server = await run(
-            serve,
-            true,
-            undefined,
-            process.argv.slice(3),
-            false,
-            extraEnv,
-          );
+          server = await run(serve, true, undefined, process.argv.slice(3), false, extraEnv);
           let startTime = new Date();
           server.on('crash', async () => {
             try {
@@ -168,9 +143,7 @@ export default async function tdd(
               if (cleaning) {
                 throw new Error('tdd process exiting...');
               } else if (crashTime - startTime < 5000) {
-                buildLog(
-                  'Process crashed immediately upon startup, press enter to restart...',
-                );
+                buildLog('Process crashed immediately upon startup, press enter to restart...');
                 process.stdin.once('data', async () => server.restart());
               } else if (pauseOnCrash) {
                 buildLog('Process crashed, press enter to restart...');

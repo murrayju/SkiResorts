@@ -1,11 +1,4 @@
-import {
-  buildLog,
-  getPkg,
-  getVersion,
-  writeFile,
-  copyDir,
-  copyFile,
-} from 'build-strap';
+import { buildLog, getPkg, getVersion, writeFile, copyDir, copyFile } from 'build-strap';
 
 /**
  * Copies everything to the build folder that we want to publish

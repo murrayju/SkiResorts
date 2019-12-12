@@ -27,6 +27,7 @@ module.exports = {
     'no-underscore-dangle': 'off',
     'no-use-before-define': 'off',
     'no-nested-ternary': 'off',
+    'no-unused-vars': 'warn',
     'func-names': ['error', 'never'],
     'lines-between-class-members': [
       'error',

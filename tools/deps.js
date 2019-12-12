@@ -3,9 +3,7 @@ import cleanDeps from './cleanDeps';
 import yarn from './yarn';
 
 // Download all external dependencies
-export default async function deps(
-  clean = process.argv.includes('--clean-deps'),
-) {
+export default async function deps(clean = process.argv.includes('--clean-deps')) {
   if (clean) {
     await run(cleanDeps);
   }

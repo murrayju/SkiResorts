@@ -3,11 +3,11 @@ export default {
     {
       url: 'https://www.snowbird.com/mountain-report/',
       selectors: {
-        openAreas: $ =>
+        areas_open: $ =>
           $('.snow-report-gates .listings .open .title')
             .map((i, item) => $(item).text())
             .get(),
-        closedAreas: $ =>
+        areas_closed: $ =>
           $('.snow-report-gates .listings .closed .title')
             .map((i, item) => $(item).text())
             .get(),
@@ -16,20 +16,20 @@ export default {
     {
       url: 'https://www.snowbird.com/lifts-trails/',
       selectors: {
-        openLifts: $ =>
+        lifts_open: $ =>
           $('.snow-report-lifts .listings .open .title')
             .map((i, item) => $(item).text())
             .get(),
-        closedLifts: $ =>
+        lifts_closed: $ =>
           $('.snow-report-lifts .listings .closed .title')
             .map((i, item) => $(item).text())
             .get(),
-        openRuns: $ =>
+        runs_open: $ =>
           $('.snow-report-trails .listings .open .title')
             .map((i, item) => $(item).text())
             .get()
             .filter(item => item !== 'Alpine Trail'),
-        closedRuns: $ =>
+        runs_closed: $ =>
           $('.snow-report-trails .listings .closed .title')
             .map((i, item) => $(item).text())
             .get()
@@ -41,7 +41,7 @@ export default {
     {
       url: 'https://www.alta.com/conditions/daily-mountain-report/snow-report',
       selectors: {
-        openLifts: $ =>
+        lifts_open: $ =>
           $('#lift-status ~ .table-weather td:has(.fa-open)')
             .map(
               (i, item) =>
@@ -53,7 +53,7 @@ export default {
             )
             .get()
             .filter(item => item !== 'OPEN'),
-        closedLifts: $ =>
+        lifts_closed: $ =>
           $('#lift-status ~ .table-weather td:has(.fa-closed)')
             .map(
               (i, item) =>
@@ -65,7 +65,7 @@ export default {
             )
             .get()
             .filter(item => item !== 'CLOSED'),
-        openAreas: $ =>
+        areas_open: $ =>
           $('#expected-openings ~ .table-weather td:has(.open-status-open)')
             .map((i, item) =>
               $(item)
@@ -74,7 +74,7 @@ export default {
             )
             .get()
             .filter(item => item !== 'OPEN'),
-        closedAreas: $ =>
+        areas_closed: $ =>
           $('#expected-openings ~ .table-weather td:has(.open-status-closed)')
             .map((i, item) =>
               $(item)

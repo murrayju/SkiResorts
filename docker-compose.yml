@@ -1,0 +1,27 @@
+version: '3.4'
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: builder
+    ports:
+      - 8000:8000
+      - 9229:9229
+      - 9222:9222
+    volumes:
+      - ./src:/opt/build/src:rw
+      - ./config:/opt/build/config:rw
+      - ./package.json:/opt/build/package.json:ro
+    command: ["tdd", "--poll-fs", "--tdd-no-docker"]
+    links:
+      - db
+  db:
+    image: mongo
+    ports:
+      - 27017:27017
+    volumes:
+      - db:/data/db:rw
+
+volumes:
+  db:

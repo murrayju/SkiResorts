@@ -1,11 +1,14 @@
+**/build/
 **/*_generated_*
 **/node_modules/
 .vscode/
 bin/
 build/
 config/local*
-db/
+db/data*/
 download/
 out/
+Dockerfile
 latest.build*
+db/
 log/

@@ -8,6 +8,7 @@ module.exports = {
         },
       },
     ],
+    '@babel/preset-flow',
   ],
   sourceMaps: 'inline',
   retainLines: true,
@@ -32,5 +33,5 @@ module.exports = {
     '@babel/plugin-proposal-nullish-coalescing-operator',
     '@babel/plugin-proposal-do-expressions',
   ],
-  ignore: ['node_modules', 'build' ],
+  ignore: ['node_modules', 'build', 'download'],
 };

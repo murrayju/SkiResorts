@@ -20,10 +20,17 @@ export default async function dockerTest(
         '--rm',
         ...(interactive ? ['-it'] : []),
         ...(integration ? [`--network=${network}`] : []),
-        ...(useConfig || integration ? ['-v', `${path.resolve('./config')}:/opt/build/config`] : []),
+        ...(useConfig || integration
+          ? ['-v', `${path.resolve('./config')}:/opt/build/config`]
+          : []),
       ],
       await getBuilderImage(tag),
-      ['test', '--test-only', '--test-no-dockerize-deps', ...(integration ? ['--test-integration'] : [])],
+      [
+        'test',
+        '--test-only',
+        '--test-no-dockerize-deps',
+        ...(integration ? ['--test-integration'] : []),
+      ],
     );
   } finally {
     // cleanup

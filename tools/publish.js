@@ -16,7 +16,9 @@ export default async function doPublish() {
   let publishToArtifactory = process.argv.includes('--force-publish');
   if (!publishToArtifactory && process.argv.includes('--publish')) {
     if (parseInt(version.build, 10) === 0) {
-      buildLog('Ignoring --publish for dev build (build number is 0). Use --force-publish to override.');
+      buildLog(
+        'Ignoring --publish for dev build (build number is 0). Use --force-publish to override.',
+      );
     } else {
       publishToArtifactory = true;
     }

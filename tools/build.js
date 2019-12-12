@@ -18,7 +18,12 @@ import generateSrc from './generateSrc';
 /**
  * Transforms source into production ready code/binary
  */
-export default async function build(watch = process.argv.includes('--watch'), doLint = true, doFlow = true, cbFn) {
+export default async function build(
+  watch = process.argv.includes('--watch'),
+  doLint = true,
+  doFlow = true,
+  cbFn,
+) {
   const noBuild = process.argv.includes('--no-build') || process.argv.includes('--build-once');
   if (process.argv.includes('--no-initial-build')) {
     buildLog('Skipping due to --no-initial-build');
@@ -84,7 +89,9 @@ export default async function build(watch = process.argv.includes('--watch'), do
             const end = new Date();
             const time = end.getTime() - start.getTime();
             buildLog(
-              `Processed ${event} to '${src}' in ${time} ms${willQueue ? ` (after ${queueTime} ms in queue)` : ''}`,
+              `Processed ${event} to '${src}' in ${time} ms${
+                willQueue ? ` (after ${queueTime} ms in queue)` : ''
+              }`,
               end,
             );
             if (cbFn && queue.getQueueLength() === 0) {
@@ -100,7 +107,11 @@ export default async function build(watch = process.argv.includes('--watch'), do
 
     const doBabel = async () => {
       await clean(['./build/src/**']);
-      await Promise.all([run(babelTransform), ...(doLint ? [run(lint)] : []), ...(doFlow ? [run(flow)] : [])]);
+      await Promise.all([
+        run(babelTransform),
+        ...(doLint ? [run(lint)] : []),
+        ...(doFlow ? [run(flow)] : []),
+      ]);
     };
     const babelWatcher = createWatcher(['./src/**/*'], async () =>
       noBuild ? buildLog('Skipping babel due to --no-build') : doBabel(),

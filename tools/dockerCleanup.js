@@ -9,7 +9,12 @@ export default async function dockerCleanup(
   purgeAll: boolean = process.argv.includes('--purge-all'),
   purgeOld: boolean = process.argv.includes('--purge-old'),
 ) {
-  const files = ['./latest.builder.tag', './latest.builder.id', './latest.build.tag', './latest.build.id'];
+  const files = [
+    './latest.builder.tag',
+    './latest.builder.id',
+    './latest.build.tag',
+    './latest.build.id',
+  ];
   await Promise.all(files.map(async f => fs.ensureFile(f)));
   const builderTag = (await fs.readFile('./latest.builder.tag')).toString();
   const builderId = (await fs.readFile('./latest.builder.id')).toString();
@@ -17,7 +22,8 @@ export default async function dockerCleanup(
   const buildId = (await fs.readFile('./latest.build.id')).toString();
 
   // We only match images without a latest* tag, and more than an hour old
-  const filterLatest: DockerImageFilter = (m: DockerImage) => purgeAll || !m.tag.match(/^latest(-\w+)?$/);
+  const filterLatest: DockerImageFilter = (m: DockerImage) =>
+    purgeAll || !m.tag.match(/^latest(-\w+)?$/);
   const filterOld: DockerImageFilter = (m: DockerImage) =>
     purgeAll || (filterLatest(m) && m.created < Date.now() - 1000 * 60 * 60);
 
@@ -35,7 +41,9 @@ export default async function dockerCleanup(
     ...(await getUntaggedDockerIds(getBuilderRepo(), filterOld)),
 
     // images with no repo and no tag
-    ...(await dockerImages(null, m => m.repository === '<none>' && m.tag === '<none>' && filterOld(m))).map(m => m.id),
+    ...(
+      await dockerImages(null, m => m.repository === '<none>' && m.tag === '<none>' && filterOld(m))
+    ).map(m => m.id),
 
     // any leftover tags from prior builds (only if purgeAll or purgeOld)
     ...(purgeAll || purgeOld

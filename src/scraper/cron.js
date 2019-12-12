@@ -1,14 +1,14 @@
-import { getResortData } from './scraper';
+import config from '@murrayju/config';
+import { CronJob } from 'cron';
+import { getResortsData } from './scraper';
 import resorts from './resorts';
+import logger from '../logger';
 
-export const startScraperCron = db => {
-  console.log(db);
-  const getAllData = () => {
-    Object.keys(resorts).forEach(async resort => {
-      const data = await getResortData(resorts[resort]);
-      console.info(resort, data);
-    });
+export const createScraperCron = db => {
+  const recordData = async () => {
+    const rawData = await getResortsData(resorts);
+    logger.debug('Fetched raw data', { rawData });
   };
 
-  return setInterval(getAllData, 60 * 60 * 1000);
+  return new CronJob(config.get('scraper.cron.interval'), recordData, null, true);
 };

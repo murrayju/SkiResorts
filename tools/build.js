@@ -18,13 +18,8 @@ import generateSrc from './generateSrc';
 /**
  * Transforms source into production ready code/binary
  */
-export default async function build(
-  watch = process.argv.includes('--watch'),
-  cbFn,
-) {
-  const noBuild =
-    process.argv.includes('--no-build') ||
-    process.argv.includes('--build-once');
+export default async function build(watch = process.argv.includes('--watch'), doLint = true, doFlow = true, cbFn) {
+  const noBuild = process.argv.includes('--no-build') || process.argv.includes('--build-once');
   if (process.argv.includes('--no-initial-build')) {
     buildLog('Skipping due to --no-initial-build');
     // Still need to copy the config (for docker tdd)
@@ -42,8 +37,12 @@ export default async function build(
       await run(cleanDeps);
     }
     await run(deps);
-    await run(lint);
-    await run(flow);
+    if (doLint) {
+      await run(lint);
+    }
+    if (doFlow) {
+      await run(flow);
+    }
     await run(generateSrc);
 
     // actual build
@@ -70,11 +69,7 @@ export default async function build(
         debounce(async (event, filePath) => {
           const src = path.relative('./', filePath);
           const willQueue = queue.getPendingLength() > 0;
-          buildLog(
-            `Detected ${event} to '${src}', ${
-              willQueue ? 'queuing' : 'executing'
-            } action`,
-          );
+          buildLog(`Detected ${event} to '${src}', ${willQueue ? 'queuing' : 'executing'} action`);
           const queueStart = new Date();
           await queue.add(async () => {
             const queueEnd = new Date();
@@ -89,9 +84,7 @@ export default async function build(
             const end = new Date();
             const time = end.getTime() - start.getTime();
             buildLog(
-              `Processed ${event} to '${src}' in ${time} ms${
-                willQueue ? ` (after ${queueTime} ms in queue)` : ''
-              }`,
+              `Processed ${event} to '${src}' in ${time} ms${willQueue ? ` (after ${queueTime} ms in queue)` : ''}`,
               end,
             );
             if (cbFn && queue.getQueueLength() === 0) {
@@ -107,19 +100,16 @@ export default async function build(
 
     const doBabel = async () => {
       await clean(['./build/src/**']);
-      await Promise.all([run(babelTransform), run(lint), run(flow)]);
+      await Promise.all([run(babelTransform), ...(doLint ? [run(lint)] : []), ...(doFlow ? [run(flow)] : [])]);
     };
     const babelWatcher = createWatcher(['./src/**/*'], async () =>
       noBuild ? buildLog('Skipping babel due to --no-build') : doBabel(),
     );
 
-    const configWatcher = createWatcher(
-      ['./config/*.yml', './config.dev/*.yml'],
-      async () => {
-        await clean(['./build/config/**']);
-        await run(copy);
-      },
-    );
+    const configWatcher = createWatcher(['./config/*.yml', './config.dev/*.yml'], async () => {
+      await clean(['./build/config/**']);
+      await run(copy);
+    });
 
     const yarnWatcher = createWatcher(yarnFiles, async () => {
       await run(yarn);

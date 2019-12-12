@@ -3,13 +3,7 @@ import express from 'express';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import uuid from 'uuid/v4';
-import type {
-  $Request,
-  $Response,
-  NextFunction,
-  Application,
-  Server,
-} from 'express';
+import type { $Request, $Response, NextFunction, Application, Server } from 'express';
 import config from '@murrayju/config';
 
 import apiRoot from './api';
@@ -48,9 +42,7 @@ export default class AppServer {
           resolve(logger.debug('Http server already closed.'));
           return;
         }
-        this.connection.close(() =>
-          resolve(logger.debug('Http server closed.')),
-        );
+        this.connection.close(() => resolve(logger.debug('Http server closed.')));
       });
       this.connection = null;
     }
@@ -95,12 +87,8 @@ function createApp(server: AppServer) {
       next: NextFunction,
     ) => {
       const statusCode: number =
-        (typeof err.statusCode === 'number'
-          ? err.statusCode
-          : parseInt(err.statusCode, 10)) || 500;
-      logger.debug(
-        `Exception caught in top level express error handler: ${err.message}`,
-      );
+        (typeof err.statusCode === 'number' ? err.statusCode : parseInt(err.statusCode, 10)) || 500;
+      logger.debug(`Exception caught in top level express error handler: ${err.message}`);
       let logLevel = 'info';
       if (statusCode === 401) {
         // auth failures aren't a real problem

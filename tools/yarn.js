@@ -6,9 +6,7 @@ import cleanYarn from './cleanYarn';
 export const yarnFiles = ['./package.json', './yarn.lock'];
 
 // Download javascript dependencies (using yarn)
-export default async function yarnInstall(
-  clean = process.argv.includes('--clean-yarn'),
-) {
+export default async function yarnInstall(clean = process.argv.includes('--clean-yarn')) {
   if (clean) {
     await run(cleanYarn);
   }
@@ -17,16 +15,12 @@ export default async function yarnInstall(
     return;
   }
   await fs.ensureDir('./node_modules');
-  const currentHash = (
-    await Promise.all(yarnFiles.map(async f => md5File(f)))
-  ).join('|');
+  const currentHash = (await Promise.all(yarnFiles.map(async f => md5File(f)))).join('|');
   const buildHashFile = './download/buildhash_yarn.md5';
   await fs.ensureFile(buildHashFile);
   const prevHash = await fs.readFile(buildHashFile, 'utf8');
   if (currentHash !== prevHash) {
-    buildLog(
-      'node package definition changed since last build, invoking yarn.',
-    );
+    buildLog('node package definition changed since last build, invoking yarn.');
   } else if (!(await readDir('./node_modules/**/*.js')).length) {
     buildLog('node packages missing, invoking yarn.');
   } else if (process.argv.includes('--force-yarn')) {

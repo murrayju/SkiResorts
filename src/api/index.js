@@ -1,8 +1,7 @@
 // @flow
-// This module is the root of the NLP API
 import Router from 'express-promise-router';
 
-import { getResortData } from '../scraper/scraper';
+import { getResortsData, getResortData } from '../scraper/scraper';
 import resorts from '../scraper/resorts';
 import type AppServer from '../AppServer';
 
@@ -12,6 +11,10 @@ export default function(server: AppServer) {
 
   router.get('/', async (req, res) => {
     res.json({ ready: true, id: server.id });
+  });
+
+  router.get('/resort', async (req, res) => {
+    res.json(await getResortsData(resorts));
   });
 
   router.get('/resort/:resort', async (req, res) => {

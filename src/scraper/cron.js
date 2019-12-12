@@ -1,11 +1,11 @@
-import { getData } from './scraper';
+import { getResortData } from './scraper';
 import resorts from './resorts';
 
 export const startScraperCron = db => {
   console.log(db);
   const getAllData = () => {
     Object.keys(resorts).forEach(async resort => {
-      const data = await getData(resorts[resort]);
+      const data = await getResortData(resorts[resort]);
       console.info(resort, data);
     });
   };

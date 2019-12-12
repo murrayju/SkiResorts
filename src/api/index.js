@@ -2,7 +2,7 @@
 // This module is the root of the NLP API
 import Router from 'express-promise-router';
 
-import { getData } from '../scraper/scraper';
+import { getResortData } from '../scraper/scraper';
 import resorts from '../scraper/resorts';
 import type AppServer from '../AppServer';
 
@@ -20,7 +20,7 @@ export default function(server: AppServer) {
       res.status(404).send();
       return;
     }
-    res.json(await getData(resort));
+    res.json(await getResortData(resort));
   });
 
   return router;

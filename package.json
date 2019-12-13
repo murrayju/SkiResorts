@@ -13,7 +13,8 @@
       "registry": "https://registry.yarnpkg.com/"
     },
     "docker": {
-      "repository": "docker.pkg.github.com/lstorey/skiresorts"
+      "repository": "lstorey/skiresorts",
+      "registry": "docker.pkg.github.com"
     }
   },
   "scripts": {

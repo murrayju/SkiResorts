@@ -27,6 +27,7 @@ FROM node:12 as production
 
 ENV appDir /opt/app
 RUN mkdir -p ${appDir}
+WORKDIR ${appDir}
 ENV NODE_ENV production
 
 COPY --from=builder ["/opt/build/build/", "${appDir}/build/"]

@@ -2,7 +2,6 @@ language: bash
 install:
   - git symbolic-ref --short HEAD || git checkout ${TRAVIS_BRANCH}
 script:
-  - 'if [ "$TRAVIS_PULL_REQUEST"  = "false" ]; then ./bs publish --buildNum=${TRAVIS_BUILD_NUMBER} --publish; fi'
-  - 'if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then ./bs publish --buildNum=${TRAVIS_BUILD_NUMBER}; fi'
-  - 'if [ "$TRAVIS_PULL_REQUEST"  = "false" ]; then docker login docker.pkg.github.com -u ${GH_DOCKER_USER} -p ${GH_DOCKER_PW}; fi'
+  - ./bs docker --buildNum=${TRAVIS_BUILD_NUMBER}
+  - docker login docker.pkg.github.com -u ${GH_DOCKER_USER} -p ${GH_DOCKER_PW}
   - 'if [ "$TRAVIS_PULL_REQUEST"  = "false" ]; then ./bs dockerPush; fi'

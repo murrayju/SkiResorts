@@ -2,9 +2,10 @@ FROM node:12 as builder
 
 ENV buildDir /opt/build
 RUN mkdir -p ${buildDir}
+WORKDIR ${buildDir}
 
 # Install node dependencies
-COPY ["yarn.lock", "package.json", ".npmrc", ".yarnrc", "babel.config.js", "${buildDir}/"]
+COPY ["yarn.lock", "package.json", "babel.config.js", "${buildDir}/"]
 RUN yarn
 
 # Build the code

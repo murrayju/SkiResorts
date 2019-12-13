@@ -22,6 +22,9 @@ services:
       - 27018:27017
     volumes:
       - db:/data/db:rw
+    # environment:
+    #   MONGO_INITDB_ROOT_USERNAME: test
+    #   MONGO_INITDB_ROOT_PASSWORD: testPass
 
 volumes:
   db:

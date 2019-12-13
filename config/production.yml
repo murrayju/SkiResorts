@@ -1,3 +1,5 @@
 ---
 server:
   port: 80
+db:
+  url: mongodb://db:27017

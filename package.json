@@ -13,7 +13,7 @@
       "registry": "https://registry.yarnpkg.com/"
     },
     "docker": {
-      "repository": "murrayju"
+      "repository": "docker.pkg.github.com/lstorey/skiresorts"
     }
   },
   "scripts": {

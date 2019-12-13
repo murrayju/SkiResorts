@@ -13,14 +13,14 @@ export default async function doPublish() {
   }
   const version = await getVersion();
 
-  let publishToArtifactory = process.argv.includes('--force-publish');
-  if (!publishToArtifactory && process.argv.includes('--publish')) {
+  let publishToGithub = process.argv.includes('--force-publish');
+  if (!publishToGithub && process.argv.includes('--publish')) {
     if (parseInt(version.build, 10) === 0) {
       buildLog(
         'Ignoring --publish for dev build (build number is 0). Use --force-publish to override.',
       );
     } else {
-      publishToArtifactory = true;
+      publishToGithub = true;
     }
   }
 
@@ -35,5 +35,5 @@ export default async function doPublish() {
     }
   }
   await clean(['./out/**']);
-  await run(publish, './build', './out', publishToArtifactory);
+  await run(publish, './build', './out', publishToGithub);
 }

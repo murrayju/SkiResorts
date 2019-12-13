@@ -1,7 +1,7 @@
 import fs from 'fs-extra';
 import { getDockerDigest, getDockerTags, dockerLogin, dockerPush } from 'build-strap';
 
-// Push docker image to artifactory
+// Push docker image to docker repo
 export default async function doDockerPush() {
   await dockerLogin();
   const file = './latest.build.id';

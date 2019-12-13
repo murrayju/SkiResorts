@@ -172,7 +172,7 @@ export async function runDbContainer(
   alias: ?string = 'db',
 ) {
   const dc = yaml.safeLoad(await fs.readFile('./docker-compose.yml'));
-  const { image } = dc.services.db;
+  const { image, environment } = dc.services.db;
   const p = port && (await getPort({ port, host }));
   buildLog('Starting database server...');
   const dockerPort = 27017;
@@ -181,6 +181,10 @@ export async function runDbContainer(
       ...(persist ? ['-v', `${path.resolve(persist)}:/data/db:rw`] : []),
       ...(p ? ['-p', `${p}:${dockerPort}`] : []),
       ...(alias ? ['--name', `ski-tdd-${alias}`] : []),
+      ...(Array.isArray(environment)
+        ? environment.reduce((args, env) => [...args, '-e', env], [])
+        : // $FlowFixMe
+          Object.entries(environment).reduce((args, [k, v]) => [...args, '-e', `${k}=${v}`], [])),
     ],
     alias,
     network,

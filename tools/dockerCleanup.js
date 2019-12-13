@@ -4,7 +4,6 @@ import { dockerImages, dockerRmi, getUntaggedDockerIds, getDockerTags } from 'bu
 import type { DockerImage, DockerImageFilter } from 'build-strap';
 import { getBuildImage, getBuilderImage, getBuilderRepo } from './docker';
 
-// Publish build artifacts to artifactory, run in docker image
 export default async function dockerCleanup(
   purgeAll: boolean = process.argv.includes('--purge-all'),
   purgeOld: boolean = process.argv.includes('--purge-old'),

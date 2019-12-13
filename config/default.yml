@@ -4,6 +4,8 @@ server:
 db:
   url: mongodb://localhost:27018
   name: skidb
+  user: ''
+  password: ''
 scraper:
   cron:
     interval: 0 0 * * * * # hourly

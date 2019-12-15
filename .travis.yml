@@ -11,6 +11,6 @@ install:
 script:
   - ./bs docker --buildNum=${TRAVIS_BUILD_NUMBER}
   - docker login docker.pkg.github.com -u ${GH_DOCKER_USER} -p ${GH_DOCKER_PW}
-  - 'if [ "$TRAVIS_PULL_REQUEST"  = "false" ]; then ./bs dockerPush; fi'
+  - 'if [ "${TRAVIS_PULL_REQUEST}"  = "false" ]; then ./bs dockerPush; fi'
 after_success:
-  - ssh -i /tmp/deploy_rsa ${DEPLOY_USER}@${DEPLOY_HOST} -p ${DEPLOY_PORT} 'docker login docker.pkg.github.com -u ${GH_DOCKER_USER} -p ${GH_DOCKER_PW} && cd ${DEPLOY_DIR} && docker-compose pull && docker-compose up -d'
+  - ssh -i /tmp/deploy_rsa ${DEPLOY_USER}@${DEPLOY_HOST} -p ${DEPLOY_PORT} "docker login docker.pkg.github.com -u ${GH_DOCKER_USER} -p ${GH_DOCKER_PW} && cd ${DEPLOY_DIR} && docker-compose pull && docker-compose up -d"

@@ -11,6 +11,10 @@ export default {
           $('.snow-report-gates .listings .closed .title')
             .map((i, item) => $(item).text())
             .get(),
+        areas_pending: $ =>
+          $('.snow-report-gates .listings .pending .title')
+            .map((i, item) => $(item).text())
+            .get(),
       },
     },
     {

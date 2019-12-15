@@ -28,6 +28,10 @@ export default {
           $('.snow-report-lifts .listings .closed .title')
             .map((i, item) => $(item).text())
             .get(),
+        lifts_pending: $ =>
+          $('.snow-report-lifts .listings .pending .title')
+            .map((i, item) => $(item).text())
+            .get(),
         runs_open: $ =>
           $('.snow-report-trails .listings .open .title')
             .map((i, item) => $(item).text())
@@ -35,6 +39,11 @@ export default {
             .filter(item => item !== 'Alpine Trail'),
         runs_closed: $ =>
           $('.snow-report-trails .listings .closed .title')
+            .map((i, item) => $(item).text())
+            .get()
+            .filter(item => item !== 'Alpine Trail'),
+        runs_pending: $ =>
+          $('.snow-report-trails .listings .pending .title')
             .map((i, item) => $(item).text())
             .get()
             .filter(item => item !== 'Alpine Trail'),

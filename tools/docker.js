@@ -16,6 +16,7 @@ import {
   dockerNetworkDelete,
   spawn,
 } from 'build-strap';
+import { entries } from '../src/util/maps';
 
 export async function getBuilderTag() {
   return `builder-${await getUniqueBuildTag()}`;
@@ -183,8 +184,7 @@ export async function runDbContainer(
       ...(alias ? ['--name', `ski-tdd-${alias}`] : []),
       ...(Array.isArray(environment)
         ? environment.reduce((args, env) => [...args, '-e', env], [])
-        : // $FlowFixMe
-          Object.entries(environment).reduce((args, [k, v]) => [...args, '-e', `${k}=${v}`], [])),
+        : entries(environment || {}).reduce((args, [k, v]) => [...args, '-e', `${k}=${v}`], [])),
     ],
     alias,
     network,

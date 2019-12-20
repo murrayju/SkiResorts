@@ -8,35 +8,34 @@ import * as mongo from './mongo';
 import { createScraperCron } from './scraper/cron';
 import handleNodeProcessEvents from './nodeProcessEvents';
 
+let app = null;
+let db = null;
 const startup = async () => {
   handleNodeProcessEvents();
-  const db = await mongo.init();
-  const app = new AppServer();
-  await app.init();
-  if (app.connection) {
-    app.connection.on('close', () => {
-      logger.info('Server disconnected.');
-    });
-    if (app.port != null) {
-      const msg = `Listening on port ${app.port}...`;
-      logger.info(msg);
-      // tests depend on this output to always indicate that the server is up and ready
-      console.info(msg);
-
-      // Listen for kill signal from nodemon
-      const killSig = process.env.NODEMON_KILL_SIG;
-      if (killSig) {
-        process.once(killSig, () => {
-          process.kill(process.pid, killSig);
-        });
-      }
-    }
-  }
+  db = await mongo.init();
+  app = await new AppServer().init();
   createScraperCron(db);
 };
 
-startup().catch(err => {
+const shutdown = async () => {
+  await app?.destroy();
+  app = null;
+  await mongo.destroy(db);
+  db = null;
+};
+
+// Listen for kill signal from nodemon
+const killSig = process.env.NODEMON_KILL_SIG;
+if (killSig) {
+  process.once(killSig, async () => {
+    await shutdown();
+    process.kill(process.pid, killSig);
+  });
+}
+
+startup().catch(async err => {
   console.error(err);
   logger.error('Failed to start the server.', err);
+  await shutdown();
   process.exit(-1);
 });

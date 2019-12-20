@@ -1,35 +1,37 @@
+// @flow
 import config from '@murrayju/config';
 import { MongoClient } from 'mongodb';
+import type { Db } from 'mongodb';
 
-let db = null;
+let db: ?Db = null;
 
-export function init() {
+export async function init(): Promise<Db> {
   const { url, user, password } = config.get('db');
-  return new Promise((resolve, reject) => {
-    MongoClient.connect(
-      url,
-      {
-        useUnifiedTopology: true,
-        ...(user && password
-          ? {
-              auth: {
-                user,
-                password,
-              },
-            }
-          : null),
-      },
-      function(err, client) {
-        if (err) {
-          return reject(err);
+  const client = await MongoClient.connect(url, {
+    useUnifiedTopology: true,
+    ...(user && password
+      ? {
+          auth: {
+            user,
+            password,
+          },
         }
-        db = client.db(config.get('db.name'));
-        return resolve(db);
-      },
-    );
+      : null),
   });
+  // get/create the database
+  db = client.db(config.get('db.name'));
+  return db;
 }
 
-export function getDb() {
+export async function destroy(passedDb?: ?Db = db) {
+  if (passedDb) {
+    await passedDb?.close();
+    if (passedDb === db) {
+      db = null;
+    }
+  }
+}
+
+export function getDb(): ?Db {
   return db;
 }

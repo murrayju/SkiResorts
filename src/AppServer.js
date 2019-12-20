@@ -16,19 +16,26 @@ export default class AppServer {
   id: string;
 
   constructor() {
-    // Create the express app
-    this.app = createApp(this);
     // a unique identifier for this server instance
     this.id = uuid();
+
+    // Create the express app
+    this.app = createApp(this);
   }
 
   async init(): Promise<AppServer> {
-    const port = config.get('server.port');
-
     // Bind app to a port
+    const port = config.get('server.port');
     if (port != null) {
       this.port = port;
       this.connection = this.app.listen(port);
+      this.connection.on('close', () => {
+        logger.info('Server disconnected.');
+      });
+      const msg = `Listening on port ${port}...`;
+      logger.info(msg);
+      // tests depend on this output to always indicate that the server is up and ready
+      console.info(msg);
     }
 
     return this;

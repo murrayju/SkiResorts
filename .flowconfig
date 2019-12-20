@@ -20,7 +20,5 @@ esproposal.optional_chaining=enable
 esproposal.nullish_coalescing=enable
 esproposal.decorators=ignore
 experimental.const_params=true
-suppress_type=$FlowTODO
-suppress_type=$FlowExternal
 
 [version]

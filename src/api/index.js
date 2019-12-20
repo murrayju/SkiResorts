@@ -2,7 +2,7 @@
 import Router from 'express-promise-router';
 
 import { getResortsData, getResortData } from '../scraper/scraper';
-import resorts from '../scraper/resorts';
+import { resorts } from '../scraper/resorts';
 import type AppServer from '../AppServer';
 
 // Middleware factory

@@ -5,6 +5,7 @@ import cors from 'cors';
 import uuid from 'uuid/v4';
 import type { $Request, $Response, NextFunction, Application, Server } from 'express';
 import config from '@murrayju/config';
+import type { Db } from 'mongodb';
 
 import apiRoot from './api';
 import logger from './logger';
@@ -14,6 +15,7 @@ export default class AppServer {
   connection: ?Server;
   port: ?number;
   id: string;
+  db: ?Db;
 
   constructor() {
     // a unique identifier for this server instance
@@ -21,9 +23,11 @@ export default class AppServer {
 
     // Create the express app
     this.app = createApp(this);
+    this.db = null;
   }
 
-  async init(): Promise<AppServer> {
+  async init(db: Db): Promise<AppServer> {
+    this.db = db;
     // Bind app to a port
     const port = config.get('server.port');
     if (port != null) {

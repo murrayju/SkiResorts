@@ -4,6 +4,7 @@ import Router from 'express-promise-router';
 import { getResortsData, getResortData } from '../scraper/scraper';
 import { resorts } from '../scraper/resorts';
 import type AppServer from '../AppServer';
+import aggregator from './aggregator';
 
 // Middleware factory
 export default function(server: AppServer) {
@@ -24,6 +25,15 @@ export default function(server: AppServer) {
       return;
     }
     res.json(await getResortData(resort));
+  });
+
+  router.get('/stats/:thing', async (req, res) => {
+    res.json(
+      await server.db
+        ?.collection(req.params.thing)
+        .aggregate(aggregator)
+        .toArray(),
+    );
   });
 
   return router;

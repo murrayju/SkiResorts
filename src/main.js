@@ -13,7 +13,7 @@ let db = null;
 const startup = async () => {
   handleNodeProcessEvents();
   db = await mongo.init();
-  app = await new AppServer().init();
+  app = await new AppServer().init(db);
   createScraperCron(db);
 };
 

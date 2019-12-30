@@ -41,6 +41,10 @@ const LineGraph = ({ height, options, ...props }: Props) => {
             ],
             ...options?.scales,
           },
+          layout: {
+            padding: 6,
+            ...options?.layout,
+          },
         }}
         // $FlowFixMe
         {...props}

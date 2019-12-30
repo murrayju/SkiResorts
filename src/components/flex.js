@@ -7,8 +7,8 @@ export const Container = styled.div`
   align-items: center;
   width: 100%;
   max-width: ${({ fullWidth }) => (fullWidth ? '100%' : '1200px')};
-  overflow-y: auto;
-  overflow-x: hidden;
+  overflow-y: ${({ scroll }) => (scroll ? 'auto' : 'visible')};
+  overflow-x: ${({ scroll }) => (scroll ? 'hidden' : 'visible')};
   > * {
     flex: 0 0 auto;
   }

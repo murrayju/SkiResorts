@@ -91,6 +91,7 @@ const config = {
           ],
           plugins: [
             ...babelCfg.plugins,
+            ['babel-plugin-styled-components', { displayName: isDebug }],
             ...(isDebug
               ? []
               : [

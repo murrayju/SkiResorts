@@ -31,7 +31,9 @@ const ResortStatsPage = ({ stat, title, graphHeight }: Props) => {
       {data ? (
         flow(
           sortBy(['_id']),
-          map(resort => <ResortStatsCard resort={resort} graphHeight={graphHeight} />),
+          map(resort => (
+            <ResortStatsCard resort={resort} graphHeight={graphHeight} key={resort._id} />
+          )),
         )(data)
       ) : (
         <Loading what="ski statistics" />

@@ -83,13 +83,13 @@ const ResortStatsCard = ({ resort, graphHeight }: Props) => {
   )(resortData);
   const primary = pending[0] || open[0] || closed[0];
   return (
-    <Paper key={resort._id}>
+    <Paper>
       <h2>{resort._id}</h2>
       <LineGraph
         height={graphHeight}
         data={{
           datasets: resortData.map((area, i) => ({
-            label: area.name,
+            label: area.name || '<empty>',
             steppedLine: true,
             lineTension: 0,
             borderColor: colors[i],
@@ -171,7 +171,7 @@ const ResortStatsCard = ({ resort, graphHeight }: Props) => {
         <div>
           <h3>pending</h3>
           {pending.map(a => (
-            <div>
+            <div key={a.name}>
               {a.name}: last open {a.lastOpen ? moment(a.lastOpen).fromNow() : 'last year'}
             </div>
           ))}
@@ -181,7 +181,7 @@ const ResortStatsCard = ({ resort, graphHeight }: Props) => {
         <div>
           <h3>open</h3>
           {open.map(a => (
-            <div>
+            <div key={a.name}>
               {a.name}: has been open{' '}
               {a.openSince ? moment(a.openSince).fromNow(true) : 'all season'}
             </div>
@@ -192,7 +192,7 @@ const ResortStatsCard = ({ resort, graphHeight }: Props) => {
         <div>
           <h3>closed</h3>
           {closed.map(a => (
-            <div>
+            <div key={a.name}>
               {a.name}: last open {a.lastOpen ? moment(a.lastOpen).fromNow() : 'last year'}
             </div>
           ))}

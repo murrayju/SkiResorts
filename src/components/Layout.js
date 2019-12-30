@@ -45,7 +45,7 @@ const bsTheme = {
 const ContentRoot = styled.div`
   ${position('fixed', '40px', 0, 0, 0)}
   display: flex;
-  background-color: ${({ theme }) => theme.brand.white};
+  background-color: ${({ theme }) => theme.brand.gray5};
   overflow: auto;
 
   th {

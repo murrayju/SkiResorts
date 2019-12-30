@@ -23,7 +23,7 @@ const Areas = () => {
       .then(setData);
   }, [fetch]);
 
-  const numLines = Math.max(...data.map(r => r.areas.length));
+  const numLines = Math.max(...data.map(r => r.data.length));
   useEffect(() => {
     if (numLines > 0) {
       setColors(
@@ -39,109 +39,126 @@ const Areas = () => {
     }
   }, [numLines]);
 
+  const now = moment();
+  const lastWeek = moment(now).subtract(10, 'days');
+  const lastYear = moment(now).subtract(1, 'year');
+
   return (
     <Container>
       {data ? (
-        sortBy(['_id'])(data).map(resort => {
-          const closed = flow(
-            filter(a => a.status === 'closed'),
-            orderBy(['lastOpen', 'lastClosed'], ['desc', 'desc']),
-          )(resort.areas);
-          const pending = flow(
-            filter(a => a.status === 'pending'),
-            orderBy(['lastOpen', 'lastClosed'], ['desc', 'desc']),
-          )(resort.areas);
-          const open = flow(
-            filter(a => a.status === 'open'),
-            orderBy(['lastClosed'], ['desc']),
-          )(resort.areas);
-          return (
-            <Paper key={resort._id}>
-              <h1>{resort._id}</h1>
-              <LineGraph
-                data={{
-                  datasets: resort.areas.map((area, i) => ({
-                    label: area.name,
-                    // steppedLine: true,
-                    lineTension: 0,
-                    // backgroundColor: 'transparent',
-                    borderColor: colors[i],
-                    hoverBorderColor:
-                      area.status === 'open'
-                        ? 'green'
-                        : area.status === 'pending'
-                        ? 'orange'
-                        : area.status === 'closed'
-                        ? 'red'
-                        : 'black',
-                    hoverBorderWidth: 3,
-                    pointRadius: 5,
-                    pointHitRadius: 5,
-                    data: [
-                      ...area.transitions.map(t => ({
-                        x: t.timestamp,
-                        y: t.status,
-                      })),
-                      {
-                        x: Date.now(),
-                        y: area.status,
-                      },
-                    ],
-                  })),
-                }}
-                options={{
-                  scales: {
-                    yAxes: [
-                      {
-                        type: 'category',
-                        labels: ['closed', 'pending', 'open'],
-                      },
-                    ],
-                    xAxes: [
-                      {
-                        type: 'time',
-                        time: {
-                          unit: 'day',
+        flow(
+          sortBy(['_id']),
+          map(resort => {
+            const resortData = flow(
+              sortBy(['name']),
+              map(({ lastOpen, lastPending, lastClosed, status, transitions, ...rest }) => ({
+                ...rest,
+                status,
+                transitions,
+                lastOpen: lastOpen || lastYear,
+                lastClosed: lastClosed || lastYear,
+                lastPending: lastPending || lastYear,
+                ...(status === 'open'
+                  ? { openSince: transitions[transitions.length - 1].timestamp }
+                  : null),
+              })),
+            )(resort.data);
+            const closed = flow(
+              filter(a => a.status === 'closed'),
+              orderBy(['lastOpen', 'lastPending', 'lastClosed'], ['desc', 'desc', 'desc']),
+            )(resortData);
+            const pending = flow(
+              filter(a => a.status === 'pending'),
+              orderBy(['lastOpen', 'lastClosed'], ['desc', 'desc']),
+            )(resortData);
+            const open = flow(
+              filter(a => a.status === 'open'),
+              orderBy(['openSince', 'lastPending', 'lastClosed'], ['desc', 'desc', 'desc']),
+            )(resortData);
+            return (
+              <Paper key={resort._id}>
+                <h1>{resort._id}</h1>
+                <LineGraph
+                  data={{
+                    datasets: resortData.map((area, i) => ({
+                      label: area.name,
+                      steppedLine: true,
+                      lineTension: 0,
+                      borderColor: colors[i],
+                      hoverBorderWidth: 3,
+                      pointRadius: 5,
+                      pointHitRadius: 5,
+                      data: [
+                        ...flow(
+                          filter(t => moment(t.timestamp).isAfter(lastWeek)),
+                          map(t => ({
+                            x: t.timestamp,
+                            y: t.status,
+                          })),
+                        )(area.transitions),
+                        {
+                          x: area.updated || now,
+                          y: area.status || 'unknown',
                         },
-                      },
-                    ],
-                  },
-                }}
-              />
-              {pending.length ? (
-                <div>
-                  <h3>pending</h3>
-                  {pending.map(a => (
-                    <div>
-                      {a.name}: last open {a.lastOpen ? moment(a.lastOpen).fromNow() : 'last year'}
-                    </div>
-                  ))}
-                </div>
-              ) : null}
-              {open.length ? (
-                <div>
-                  <h3>open</h3>
-                  {open.map(a => (
-                    <div>
-                      {a.name}: has been open{' '}
-                      {a.lastClosed ? moment(a.lastClosed).fromNow(true) : 'all season'}
-                    </div>
-                  ))}
-                </div>
-              ) : null}
-              {closed.length ? (
-                <div>
-                  <h3>closed</h3>
-                  {closed.map(a => (
-                    <div>
-                      {a.name}: last open {a.lastOpen ? moment(a.lastOpen).fromNow() : 'last year'}
-                    </div>
-                  ))}
-                </div>
-              ) : null}
-            </Paper>
-          );
-        })
+                      ],
+                    })),
+                  }}
+                  options={{
+                    scales: {
+                      yAxes: [
+                        {
+                          type: 'category',
+                          labels: ['closed', 'pending', 'open'],
+                        },
+                      ],
+                      xAxes: [
+                        {
+                          type: 'time',
+                          time: {
+                            unit: 'day',
+                          },
+                        },
+                      ],
+                    },
+                  }}
+                />
+                {pending.length ? (
+                  <div>
+                    <h3>pending</h3>
+                    {pending.map(a => (
+                      <div>
+                        {a.name}: last open{' '}
+                        {a.lastOpen ? moment(a.lastOpen).fromNow() : 'last year'}
+                      </div>
+                    ))}
+                  </div>
+                ) : null}
+                {open.length ? (
+                  <div>
+                    <h3>open</h3>
+                    {open.map(a => (
+                      <div>
+                        {a.name}: has been open{' '}
+                        {a.openSince ? moment(a.openSince).fromNow(true) : 'all season'}
+                      </div>
+                    ))}
+                  </div>
+                ) : null}
+                {closed.length ? (
+                  <div>
+                    <h3>closed</h3>
+                    {closed.map(a => (
+                      <div>
+                        {a.name}: last open{' '}
+                        {a.lastOpen ? moment(a.lastOpen).fromNow() : 'last year'}
+                      </div>
+                    ))}
+                  </div>
+                ) : null}
+              </Paper>
+            );
+          }),
+        )(data)
       ) : (
         <Loading what="ski area statistics" />
       )}

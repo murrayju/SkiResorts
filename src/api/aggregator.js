@@ -13,6 +13,9 @@ export default [
       status: {
         $last: '$status',
       },
+      updated: {
+        $last: '$timestamp',
+      },
       data: {
         $push: {
           status: '$status',
@@ -71,6 +74,30 @@ export default [
           },
         },
       },
+      lastPending: {
+        $let: {
+          vars: {
+            filtered: {
+              $filter: {
+                input: '$data',
+                cond: {
+                  $eq: ['$$this.status', 'pending'],
+                },
+              },
+            },
+          },
+          in: {
+            $let: {
+              vars: {
+                last: {
+                  $arrayElemAt: ['$$filtered', -1],
+                },
+              },
+              in: '$$last.timestamp',
+            },
+          },
+        },
+      },
       transitions: {
         $let: {
           vars: {
@@ -106,13 +133,15 @@ export default [
   {
     $group: {
       _id: '$resort',
-      areas: {
+      data: {
         $push: {
-          status: '$status',
           name: '$_id',
+          status: '$status',
+          updated: '$updated',
           transitions: '$transitions',
           lastOpen: '$lastOpen',
           lastClosed: '$lastClosed',
+          lastPending: '$lastPending',
         },
       },
     },

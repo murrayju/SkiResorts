@@ -35,7 +35,13 @@ const Sidebar = () => {
     <SidebarStyled>
       <Nav stacked className="nav-pills">
         <NavItemLink to="/">
-          <Icon name="home" pad="md" /> Areas
+          <Icon name="mountain" pad="md" fw /> Areas
+        </NavItemLink>
+        <NavItemLink to="/lifts">
+          <Icon name="tram" pad="md" fw /> Lifts
+        </NavItemLink>
+        <NavItemLink to="/runs">
+          <Icon name="road" pad="md" fw /> Runs
         </NavItemLink>
         {version ? <NavItem disabled>v{version}</NavItem> : null}
       </Nav>

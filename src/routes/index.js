@@ -10,6 +10,14 @@ const routes = {
       path: '',
       load: () => import(/* webpackChunkName: 'areas' */ './areas'),
     },
+    {
+      path: '/runs',
+      load: () => import(/* webpackChunkName: 'runs' */ './runs'),
+    },
+    {
+      path: '/lifts',
+      load: () => import(/* webpackChunkName: 'lifts' */ './lifts'),
+    },
 
     // Wildcard routes, e.g. { path: '(.*)', ... } (must go last)
     {

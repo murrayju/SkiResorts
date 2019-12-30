@@ -4,8 +4,8 @@ import ResortStatsPage from '../components/ResortStatsPage';
 
 export default async function action() {
   return {
-    title: 'Areas',
-    chunks: ['areas'],
-    component: <ResortStatsPage stat="areas" title="Resort Areas" />,
+    title: 'Lifts',
+    chunks: ['lifts'],
+    component: <ResortStatsPage stat="lifts" title="Resort Lifts" />,
   };
 }

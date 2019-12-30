@@ -73,7 +73,7 @@ export default function(dbPromise: Promise<Db>) {
     res.json(
       await db
         .collection(req.params.thing)
-        .aggregate(aggregator)
+        .aggregate(aggregator, { allowDiskUse: true })
         .toArray(),
     );
   });

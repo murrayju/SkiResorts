@@ -75,6 +75,7 @@ const Areas = () => {
               filter(a => a.status === 'open'),
               orderBy(['openSince', 'lastPending', 'lastClosed'], ['desc', 'desc', 'desc']),
             )(resortData);
+            const primary = pending[0] || open[0] || closed[0];
             return (
               <Paper key={resort._id}>
                 <h1>{resort._id}</h1>
@@ -88,6 +89,7 @@ const Areas = () => {
                       hoverBorderWidth: 3,
                       pointRadius: 5,
                       pointHitRadius: 5,
+                      hidden: area !== primary,
                       data: [
                         ...flow(
                           filter(t => moment(t.timestamp).isAfter(lastWeek)),
@@ -119,6 +121,42 @@ const Areas = () => {
                           },
                         },
                       ],
+                    },
+                    legend: {
+                      onClick(e, item) {
+                        const { chart } = this;
+                        const { datasetIndex: index } = item;
+                        const { datasets } = chart.data;
+                        const { length } = datasets;
+                        const metas = Array.from({ length }).map((x, i) => chart.getDatasetMeta(i));
+                        const isHidden = i =>
+                          metas[i].hidden == null ? datasets[i].hidden : metas[i].hidden;
+                        const hideStates = Array.from({ length }).map((x, i) => isHidden(i));
+
+                        if (hideStates.every(h => !h)) {
+                          // nothing hidden, hide all but the one clicked
+                          metas.forEach((m, i) => {
+                            // eslint-disable-next-line no-param-reassign
+                            m.hidden = i !== index;
+                          });
+                        } else if (hideStates.filter(h => !h).length === 1) {
+                          // only one thing is currently shown
+                          if (index === hideStates.findIndex(h => !h)) {
+                            // it's the one that was clicked, toggle showing all
+                            metas.forEach((m, i) => {
+                              // eslint-disable-next-line no-param-reassign
+                              m.hidden = false;
+                            });
+                          } else {
+                            // toggle only the one clicked
+                            metas[index].hidden = false;
+                          }
+                        } else {
+                          // toggle only the one clicked
+                          metas[index].hidden = !hideStates[index];
+                        }
+                        chart.update();
+                      },
                     },
                   }}
                 />

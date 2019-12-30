@@ -1,0 +1,14 @@
+@import (less) '../node_modules/bootstrap/less/bootstrap.less';
+
+.navbar-inverse {
+  #gradient.vertical(
+    @start-color: @gray-dark;
+    @end-color: @gray-darker;
+    @start-percent: 0%;
+    @end-percent: 100%;
+  );
+}
+
+@navbar-height: 40px;
+// change when the navbar switches to dropdown menu
+@grid-float-breakpoint: 450px;

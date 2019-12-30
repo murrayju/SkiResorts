@@ -12,8 +12,7 @@ RUN yarn
 ARG BUILD_NUMBER
 ENV BUILD_NUMBER ${BUILD_NUMBER:-0}
 COPY [".", "${buildDir}/"]
-RUN yarn run run publish --publish-node-modules
-RUN mkdir /temp && mv "${buildDir}/build/node_modules" "/temp/node_modules_prod"
+RUN yarn run run publish --release --publish-node-modules
 
 # Defaults when running this container
 EXPOSE 443
@@ -28,12 +27,11 @@ FROM node:12 as production
 ENV appDir /opt/app
 RUN mkdir -p ${appDir}
 WORKDIR ${appDir}
+
 ENV NODE_ENV production
 
-COPY --from=builder ["/opt/build/build/", "${appDir}/build/"]
-COPY --from=builder ["/temp/node_modules_prod", "${appDir}/node_modules"]
-RUN  mv ${appDir}/build/package.json ${appDir}/
-RUN cp -R ${appDir}/build/config ${appDir}/
+COPY --from=builder ["/opt/build/build/", "${appDir}/"]
+
 RUN mkdir /config
 
-CMD ["node", "./build/src/main.js"]
+CMD ["node", "./server.js"]

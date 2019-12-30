@@ -58,8 +58,8 @@ export default async function dockerProd(
       ));
     }
 
-    const dockerPort = 443;
-    const localPort = await getPort({ port: 8443, host: '0.0.0.0' });
+    const dockerPort = 80;
+    const localPort = await getPort({ port: 8008, host: '0.0.0.0' });
 
     buildLog(`Starting server, to be available at https://localhost:${localPort}`);
 
@@ -71,13 +71,11 @@ export default async function dockerProd(
         '-p',
         `${localPort}:${dockerPort}`,
         '-e',
-        'LOG_DIR=/log',
-        '-e',
         `PORT=${dockerPort}`,
         ...(integration
           ? [
               ...(dbHost && dbPort
-                ? ['-e', 'DB_ENABLED=true', '-e', `DB_HOST=${dbHost}`, '-e', `DB_PORT=${dbPort}`]
+                ? ['-e', 'DB_ENABLED=true', '-e', `DB_HOST=mongodb://${dbHost}:${dbPort}`]
                 : []),
               `--network=${network}`,
             ]

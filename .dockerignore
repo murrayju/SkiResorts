@@ -5,7 +5,6 @@
 bin/
 build/
 config/local*
-db/data*/
 download/
 out/
 Dockerfile

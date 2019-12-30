@@ -1,6 +1,9 @@
 ---
 server:
   port: 8002
+  serverUrl: ''
+  clientUrl: ''
+  trustProxy: loopback
 db:
   url: mongodb://localhost:27018
   name: skidb

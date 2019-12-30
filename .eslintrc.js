@@ -1,20 +1,25 @@
 module.exports = {
   parser: 'babel-eslint',
 
-  plugins: ['flowtype', 'prettier', 'babel'],
-
+  plugins: ['flowtype', 'css-modules', 'prettier', 'react-hooks'],
   extends: [
-    'airbnb-base',
+    'airbnb',
     'plugin:flowtype/recommended',
+    'plugin:css-modules/recommended',
     'plugin:prettier/recommended',
   ],
 
   parserOptions: {
     sourceType: 'module',
-    ecmaVersion: 2018,
+    ecmaVersion: 2019,
+  },
+
+  globals: {
+    __DEV__: true,
   },
 
   env: {
+    browser: true,
     node: true,
     es6: true,
   },
@@ -29,14 +34,9 @@ module.exports = {
     'no-nested-ternary': 'off',
     'no-unused-vars': 'warn',
     'func-names': ['error', 'never'],
-    'lines-between-class-members': [
-      'error',
-      'always',
-      { exceptAfterSingleLine: true },
-    ],
+    'lines-between-class-members': ['error', 'always', { exceptAfterSingleLine: true }],
     // Support for do-expressions
     'no-unused-expressions': 'off',
-    'babel/no-unused-expressions': 'error',
     // Forbid the use of extraneous packages
     // https://github.com/benmosher/eslint-plugin-import/blob/master/docs/rules/no-extraneous-dependencies.md
     'import/no-extraneous-dependencies': ['error', { packageDir: '.' }],
@@ -52,6 +52,8 @@ module.exports = {
       },
     ],
     'no-debugger': 'warn',
+    'no-nested-ternary': 'off',
+
     // Prefer destructuring from arrays and objects
     // http://eslint.org/docs/rules/prefer-destructuring
     'prefer-destructuring': [
@@ -70,13 +72,41 @@ module.exports = {
         enforceForRenamedProperties: false,
       },
     ],
+
+    // Ensure <a> tags are valid
+    // https://github.com/evcohen/eslint-plugin-jsx-a11y/blob/master/docs/rules/anchor-is-valid.md
+    'jsx-a11y/anchor-is-valid': [
+      'error',
+      {
+        components: ['Link'],
+        specialLink: ['to'],
+        aspects: ['noHref', 'invalidHref', 'preferButton'],
+      },
+    ],
+
+    // Allow .js files to use JSX syntax
+    // https://github.com/yannickcr/eslint-plugin-react/blob/master/docs/rules/jsx-filename-extension.md
+    'react/jsx-filename-extension': ['error', { extensions: ['.js', '.jsx'] }],
+
+    // Functional and class components are equivalent from React’s point of view
+    // https://github.com/yannickcr/eslint-plugin-react/blob/master/docs/rules/prefer-stateless-function.md
+    'react/prefer-stateless-function': 'off',
+    'react/forbid-prop-types': 'off',
+    'react/static-property-placement': ['error', 'static public field'],
+    'react/jsx-props-no-spreading': 'off',
+    'react/jsx-one-expression-per-line': 'off',
+    'react/destructuring-assignment': ['warn', 'always', { ignoreClassFields: true }],
+    'react-hooks/rules-of-hooks': 'error',
+    'react-hooks/exhaustive-deps': 'warn',
   },
-  overrides: [
-    {
-      files: ['*.test.js'],
-      rules: {
-        'babel/no-unused-expressions': 'off',
+
+  settings: {
+    // Allow absolute paths in imports, e.g. import Button from 'components/Button'
+    // https://github.com/benmosher/eslint-plugin-import/tree/master/resolvers
+    'import/resolver': {
+      node: {
+        moduleDirectory: ['node_modules', 'src'],
       },
     },
-  ],
+  },
 };

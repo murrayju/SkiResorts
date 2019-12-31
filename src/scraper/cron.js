@@ -3,7 +3,7 @@ import config from '@murrayju/config';
 import { CronJob } from 'cron';
 import type { Db } from 'mongodb';
 import { getResortsData } from './scraper';
-import { resorts } from './resorts';
+import resorts from './resorts';
 import logger from '../logger';
 import { entries } from '../util/maps';
 
@@ -23,7 +23,7 @@ export const createScraperCron = (db: Db) => {
       entries(rawData).map(async ([resort, resortData]) => {
         // $FlowFixMe
         await Promise.allSettled(
-          entries(resortData).map(async ([comboName, values]) => {
+          entries(resortData.status).map(async ([comboName, values]) => {
             const [type, status] = comboName.split('_');
             // $FlowFixMe
             await Promise.allSettled(
@@ -38,6 +38,14 @@ export const createScraperCron = (db: Db) => {
             );
           }),
         );
+
+        if (Object.keys(resortData.weather).length) {
+          await db.collection('weather').insertOne({
+            ...resortData.weather,
+            resort,
+            timestamp,
+          });
+        }
       }),
     );
   };

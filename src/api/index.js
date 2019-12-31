@@ -6,7 +6,7 @@ import cookieParser from 'cookie-parser';
 import uuid from 'uuid/v4';
 
 import { getResortsData, getResortData } from '../scraper/scraper';
-import { resorts } from '../scraper/resorts';
+import resorts from '../scraper/resorts';
 import aggregator from './aggregator';
 // $FlowFixMe - generated file
 import { version } from '../version._generated_'; // eslint-disable-line import/no-unresolved

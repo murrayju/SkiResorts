@@ -1,10 +1,34 @@
 // @flow
-import type { ResortScraper, ScraperMap } from './scraper';
+import { isNaN } from 'lodash';
+import type { ResortScraper } from '../scraper';
 
-export const snowbird: ResortScraper = [
+const windRegex = /\s*([^@]+)@([^m]+mph)/i;
+const findCondition = (regex: RegExp) => $ =>
+  $('.conditions-data .conditions > div')
+    .filter((i, item) =>
+      regex.test(
+        $(item)
+          .children('.sb-condition_label')
+          .text(),
+      ),
+    )
+    .map((i, item) =>
+      $(item)
+        .find('.sb-condition_value')
+        .text()
+        .trim(),
+    )
+    .get()[0];
+
+const findConditionNum = (regex: RegExp) => $ => {
+  const num = parseFloat(findCondition(regex)($));
+  return isNaN(num) ? undefined : num;
+};
+
+const snowbird: ResortScraper = [
   {
     url: 'https://www.snowbird.com/mountain-report/',
-    selectors: {
+    statusSelectors: {
       areas_open: $ =>
         $('.snow-report-gates .listings .open .title')
           .map((i, item) => $(item).text())
@@ -18,10 +42,21 @@ export const snowbird: ResortScraper = [
           .map((i, item) => $(item).text())
           .get(),
     },
+    weatherSelectors: {
+      inches12hr: findConditionNum(/12hr/i),
+      inches24hr: findConditionNum(/24hr/i),
+      inches48hr: findConditionNum(/48hr/i),
+      seasonTotalInches: findConditionNum(/ytd/i),
+      baseDepthInches: findConditionNum(/depth/i),
+      currentTempMidMtnF: findConditionNum(/mid-mtn temp/i),
+      currentTempBaseF: findConditionNum(/base temp/i),
+      windSpeed: $ => findCondition(/wind speed/i)($).match(windRegex)?.[2],
+      windDirection: $ => findCondition(/wind speed/i)($).match(windRegex)?.[1],
+    },
   },
   {
     url: 'https://www.snowbird.com/lifts-trails/',
-    selectors: {
+    statusSelectors: {
       lifts_open: $ =>
         $('.snow-report-lifts .listings .open .title')
           .map((i, item) => $(item).text())
@@ -52,57 +87,4 @@ export const snowbird: ResortScraper = [
     },
   },
 ];
-
-export const alta = [
-  {
-    url: 'https://www.alta.com/conditions/daily-mountain-report/snow-report',
-    selectors: {
-      lifts_open: $ =>
-        $('#lift-status ~ .table-weather td:has(.fa-open)')
-          .map(
-            (i, item) =>
-              $(item)
-                .prev()
-                .text()
-                .trim()
-                .split('\n')[0],
-          )
-          .get()
-          .filter(item => item !== 'OPEN'),
-      lifts_closed: $ =>
-        $('#lift-status ~ .table-weather td:has(.fa-closed)')
-          .map(
-            (i, item) =>
-              $(item)
-                .prev()
-                .text()
-                .trim()
-                .split('\n')[0],
-          )
-          .get()
-          .filter(item => item !== 'CLOSED'),
-      areas_open: $ =>
-        $('#expected-openings ~ .table-weather td:has(.open-status-open)')
-          .map((i, item) =>
-            $(item)
-              .prev()
-              .text(),
-          )
-          .get()
-          .filter(item => item !== 'OPEN'),
-      areas_closed: $ =>
-        $('#expected-openings ~ .table-weather td:has(.open-status-closed)')
-          .map((i, item) =>
-            $(item)
-              .prev()
-              .text(),
-          )
-          .get()
-          .filter(item => item !== 'CLOSED'),
-    },
-  },
-];
-
-export const resorts: ScraperMap = { snowbird, alta };
-
-export default resorts;
+export default snowbird;

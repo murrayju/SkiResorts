@@ -5,15 +5,23 @@ import { mapValues } from 'lodash/fp';
 import { merge } from 'lodash';
 import { Promise as Bluebird } from 'bluebird';
 
-export type PageScraper = {
+export type PageScraper = {|
   url: string,
-  selectors: {
+  statusSelectors?: {
     [string]: ($: Function) => string[],
   },
-};
+  weatherSelectors?: {
+    [string]: ($: Function) => ?(string | number | void),
+  },
+|};
 
 export type ScraperResult = {
-  [string]: string[],
+  status: {
+    [string]: string[],
+  },
+  weather: {
+    [string]: string,
+  },
 };
 
 export type ResortScraper = PageScraper[];
@@ -26,12 +34,19 @@ export type ScraperMap = {
   [resortName: string]: ResortScraper,
 };
 
-export const getPageData = async ({ url, selectors }: PageScraper): Promise<ScraperResult> => {
+export const getPageData = async ({
+  url,
+  statusSelectors,
+  weatherSelectors,
+}: PageScraper): Promise<ScraperResult> => {
   const $ = await fetch(url)
     .then(r => r.text())
     .then(html => cheerio.load(html));
 
-  return mapValues(s => s($))(selectors);
+  return {
+    status: mapValues(s => s($))(statusSelectors),
+    weather: mapValues(s => s($))(weatherSelectors),
+  };
 };
 
 export const getResortData = async (resortPages: ResortScraper): Promise<ScraperResult> => {

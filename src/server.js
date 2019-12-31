@@ -55,7 +55,7 @@ const createApp = async () => {
   app.use(bodyParser.json());
 
   // initialize the db
-  const { db, mongoClient } = await mongo.init();
+  const { db, client: mongoClient } = await mongo.init();
   const cronJob = createScraperCron(db);
 
   app.use('/api', api(db));

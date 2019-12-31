@@ -9,6 +9,37 @@ db:
   name: skidb
   user: ''
   password: ''
+  collections:
+    areas:
+      indexes:
+      - key:
+          name: 1
+      - key:
+          resort: 1
+      - key:
+          timestamp: -1
+    lifts:
+      indexes:
+      - key:
+          name: 1
+      - key:
+          resort: 1
+      - key:
+          timestamp: -1
+    runs:
+      indexes:
+      - key:
+          name: 1
+      - key:
+          resort: 1
+      - key:
+          timestamp: -1
+    weather:
+      indexes:
+      - key:
+          resort: 1
+      - key:
+          timestamp: -1
 scraper:
   enabled: true
   cron:

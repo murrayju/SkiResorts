@@ -12,7 +12,8 @@ import fs from 'fs-extra';
 import webpackConfig from './webpack.config';
 import run from './run';
 import clean from './clean';
-import build from './build';
+import lint from './lint';
+import flow from './flow';
 import { runDbContainer, dockerTeardown } from './docker';
 import handleNodeProcessEvents from '../src/nodeProcessEvents';
 
@@ -55,14 +56,13 @@ function createCompilationPromise(name, compiler, cfg) {
  * synchronizing URLs, interactions and code changes across multiple devices.
  */
 async function start(
-  initialBuild = !process.argv.includes('--tdd-no-initial-build'),
   runDatabase = !process.argv.includes('--tdd-no-db') && !process.argv.includes('--tdd-no-docker'),
   persistDbData = !process.argv.includes('--tdd-no-db-persist'),
   noDocker = process.argv.includes('--tdd-no-docker'),
 ) {
-  if (initialBuild) {
-    await run(build);
-  }
+  // initial lint
+  await run(lint);
+  await run(flow);
 
   handleNodeProcessEvents();
 

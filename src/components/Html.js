@@ -10,8 +10,8 @@ import bs from '../bs-theme.less'; // eslint-disable-line
 type Props = {
   title: string,
   description: string,
-  scripts: string[],
-  app: Object,
+  scripts?: ?(string[]),
+  app?: ?Object,
   children: React.Node,
   styleTags: any,
 };
@@ -45,10 +45,14 @@ const Html = ({ title, description, scripts, app, children, styleTags }: Props) 
     </head>
     <body>
       <div id="app" dangerouslySetInnerHTML={{ __html: children }} />
-      <script dangerouslySetInnerHTML={{ __html: `window.App=${serialize(app)}` }} />
+      {app ? <script dangerouslySetInnerHTML={{ __html: `window.App=${serialize(app)}` }} /> : null}
       {scripts && scripts.map(script => <script key={script} src={script} />)}
     </body>
   </html>
 );
+Html.defaultProps = {
+  app: null,
+  scripts: null,
+};
 
 export default Html;

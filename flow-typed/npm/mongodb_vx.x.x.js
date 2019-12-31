@@ -72,11 +72,12 @@ declare type connectOptions = {
 
 declare class MongoDB$MongoClient {
   constructor(): this;
-  static connect(
-    url: string,
-    options?: connectOptions,
-    callback?: connectCallback,
-  ): Promise<MongoDB$Db>;
+  static connect(url: string, options?: connectOptions, callback?: connectCallback): Promise<this>;
+  close(force?: boolean, callback?: resultCallback<void>): Promise<void>;
+  db(
+    name: string,
+    options?: { noListener?: boolean, returnNonCachedInstance?: boolean },
+  ): MongoDB$Db;
 }
 
 declare class MongoDB$Db {
@@ -93,14 +94,7 @@ declare class MongoDB$Db {
     callback?: resultCallback<Object>,
   ): Promise<Object>;
 
-  close(force?: boolean, callback?: resultCallback<void>): Promise<void>;
-
   collection(name: string, options?: ?Object): MongoDB$Collection;
-
-  db(
-    name: string,
-    options?: { noListener?: boolean, returnNonCachedInstance?: boolean },
-  ): MongoDB$Db;
 }
 
 declare module 'mongodb' {

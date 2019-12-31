@@ -26,7 +26,7 @@ export type ApiRequest = {
 };
 
 // Middleware factory
-export default function(dbPromise: Promise<Db>) {
+export default function(db: Db) {
   const router = Router();
 
   router.use(cors());
@@ -36,7 +36,6 @@ export default function(dbPromise: Promise<Db>) {
     // use a cookie to identify clients
     const clientId = req.cookies.clientId || uuid();
     res.cookie('clientId', clientId);
-    const db = await dbPromise;
     // namespace all extra parameters under req.ski (more get added later)
     req.ski = {
       correlationId: uuid(),
@@ -69,7 +68,6 @@ export default function(dbPromise: Promise<Db>) {
   });
 
   router.get('/stats/:thing', async (req: ApiRequest, res) => {
-    const { db } = req.ski;
     res.json(
       await db
         .collection(req.params.thing)

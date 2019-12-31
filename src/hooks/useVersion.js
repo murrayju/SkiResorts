@@ -11,7 +11,7 @@ const useVersion = () => {
       method: 'GET',
     })
       .then(r => r.json())
-      .then(({ version: v }) => setVersion(v));
+      .then(({ info: v }) => setVersion(v));
   }, [fetch]);
 
   return [version];

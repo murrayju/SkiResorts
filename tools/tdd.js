@@ -15,7 +15,6 @@ import clean from './clean';
 import lint from './lint';
 import flow from './flow';
 import { runDbContainer, dockerTeardown } from './docker';
-import handleNodeProcessEvents from '../src/nodeProcessEvents';
 
 const isDebug = !process.argv.includes('--release');
 
@@ -63,8 +62,6 @@ async function start(
   // initial lint
   await run(lint);
   await run(flow);
-
-  handleNodeProcessEvents();
 
   // Doesn't resolve until kill signal sent
   // eslint-disable-next-line no-async-promise-executor
@@ -151,7 +148,8 @@ async function start(
         appPromise = new Promise(resolve => (appPromiseResolve = resolve));
       });
 
-      let app;
+      let app = null;
+      let destroy = null;
       server.use((req, res) => {
         appPromise.then(() => app.handle(req, res)).catch(error => console.error(error));
       });
@@ -182,12 +180,13 @@ async function start(
               checkForUpdate(true);
             }
           })
-          .catch(error => {
+          .catch(async error => {
             if (['abort', 'fail'].includes(app.hot.status())) {
               console.warn(`${hmrPrefix}Cannot apply update.`);
+              await destroy?.();
               delete require.cache[require.resolve('../build/server')];
               // eslint-disable-next-line global-require, import/no-unresolved
-              app = require('../build/server').default;
+              ({ app, destroy } = await require('../build/server').default());
               console.warn(`${hmrPrefix}App has been reloaded.`);
             } else {
               console.warn(`${hmrPrefix}Update failed: ${error.stack || error.message}`);
@@ -213,7 +212,7 @@ async function start(
 
       // Load compiled src/server.js as a middleware
       // eslint-disable-next-line global-require, import/no-unresolved
-      app = require('../build/server').default;
+      ({ app, destroy } = await require('../build/server').default());
       appPromiseIsResolved = true;
       appPromiseResolve();
 

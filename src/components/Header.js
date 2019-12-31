@@ -59,9 +59,7 @@ const Header = ({ onMenuClick, menuActive }: Props) => {
           </Title>
         </Navbar.Brand>
       </Navbar.Header>
-      <Navbar.Collapse>
-        {version ? <Navbar.Text pullRight>v{version}</Navbar.Text> : null}
-      </Navbar.Collapse>
+      <Navbar.Collapse>{version ? <Navbar.Text>v{version}</Navbar.Text> : null}</Navbar.Collapse>
     </StyledNavbar>
   );
 };

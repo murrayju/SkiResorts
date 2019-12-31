@@ -14,7 +14,7 @@ export const createScraperCron = (db: Db) => {
       return;
     }
     const rawData = await getResortsData(resorts);
-    logger.debug('Fetched raw data', { rawData });
+    logger.debug('Fetched raw data' /* , { rawData } */);
 
     const timestamp = new Date();
 

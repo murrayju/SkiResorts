@@ -119,6 +119,7 @@ const alta: ResortScraper = [
           }
           return ts;
         }
+        return undefined;
       },
       summary_snowSince4amInches: findNumberInHTable(
         '#snow-fall ~ .table-weather',

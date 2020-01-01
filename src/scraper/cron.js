@@ -1,13 +1,13 @@
 // @flow
 import config from '@murrayju/config';
 import { CronJob } from 'cron';
-import type { Db } from 'mongodb';
 import { getResortsData } from './scraper';
 import resorts from './resorts';
 import logger from '../logger';
 import { entries } from '../util/maps';
+import type { ServerContext } from '../server';
 
-export const createScraperCron = (db: Db) => {
+export const createScraperCron = ({ db, emitter }: ServerContext) => {
   const recordData = async () => {
     if (!config.get('scraper.enabled')) {
       logger.debug('scraper disabled, skipping');
@@ -28,23 +28,27 @@ export const createScraperCron = (db: Db) => {
             // $FlowFixMe
             await Promise.allSettled(
               values.map(async name => {
-                await db.collection(type).insertOne({
+                const newData = {
                   resort,
                   name,
                   status,
                   timestamp,
-                });
+                };
+                await db.collection(type).insertOne(newData);
+                emitter.emit('NEW_RESORT_DATA', type, newData);
               }),
             );
           }),
         );
 
         if (Object.keys(resortData.weather).length) {
-          await db.collection('weather').insertOne({
+          const newData = {
             ...resortData.weather,
             resort,
             timestamp,
-          });
+          };
+          await db.collection('weather').insertOne(newData);
+          emitter.emit('NEW_WEATHER_DATA', newData);
         }
       }),
     );

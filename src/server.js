@@ -11,6 +11,7 @@ import PrettyError from 'pretty-error';
 import { ServerStyleSheet, StyleSheetManager } from 'styled-components';
 import { renderStylesToString } from 'emotion-server';
 import bodyParser from 'body-parser';
+import type { Db } from 'mongodb';
 
 import { handleNodeProcessEvents, unregisterNodeProcessEvents } from './nodeProcessEvents';
 import App from './components/App';
@@ -25,6 +26,14 @@ import AppContext from './contexts/AppContext';
 import api from './api';
 import * as mongo from './mongo';
 import { createScraperCron } from './scraper/cron';
+import Emitter from './scraper/emitter';
+import dataListener from './events/DataListener';
+import alertListener from './events/AlertListener';
+
+export type ServerContext = {
+  db: Db,
+  emitter: Emitter,
+};
 
 //
 // Tell any CSS tooling (such as Material UI) to use all vendor prefixes if the
@@ -56,7 +65,11 @@ const createApp = async () => {
 
   // initialize the db
   const { db, client: mongoClient } = await mongo.init();
-  const cronJob = createScraperCron(db);
+  const emitter = new Emitter();
+  const serverContext: ServerContext = { db, emitter };
+  const cronJob = createScraperCron(serverContext);
+  dataListener(serverContext);
+  alertListener(serverContext);
 
   app.use('/api', api(db));
 
@@ -194,6 +207,7 @@ const createApp = async () => {
     async destroy() {
       connection?.close();
       cronJob.stop();
+      emitter.removeAllListeners();
       await mongo.destroy(mongoClient);
       unregisterNodeProcessEvents();
     },

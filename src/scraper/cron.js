@@ -57,7 +57,7 @@ export const createScraperCron = ({ db, emitter }: ServerContext) => {
             const [prev] = await db
               .collection('weather')
               .find({ resort, location })
-              .sort({ timestamp: -1 })
+              .sort({ lastUpdated: -1 })
               .limit(1)
               .toArray();
             if (!prev || prev.lastUpdated !== lastUpdated) {

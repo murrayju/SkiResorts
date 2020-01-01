@@ -8,6 +8,7 @@ import webpackHotMiddleware from 'webpack-hot-middleware';
 import errorOverlayMiddleware from 'react-dev-utils/errorOverlayMiddleware';
 import { format, onKillSignal, buildLog, dockerNetworkCreate } from 'build-strap';
 import fs from 'fs-extra';
+import chokidar from 'chokidar';
 
 import webpackConfig from './webpack.config';
 import run from './run';
@@ -25,6 +26,7 @@ const watchOptions = {
   // Decrease CPU or memory usage in some file systems
   // ignored: /node_modules/,
 };
+const hmrPrefix = '[\x1b[35mHMR\x1b[0m] ';
 
 function createCompilationPromise(name, compiler, cfg) {
   return new Promise((resolve, reject) => {
@@ -67,10 +69,12 @@ async function start(
     const network = 'ski-resorts-tdd';
 
     let cleaning = null;
+    let cfgWatcher = null;
     const cleanupAndExit = async () => {
       if (!cleaning) {
         cleaning = (async () => {
           buildLog('Process exiting... cleaning up...');
+          cfgWatcher?.close();
           await dockerTeardown();
           buildLog('Cleanup finished.');
           outerResolve();
@@ -152,9 +156,19 @@ async function start(
         appPromise.then(() => app.handle(req, res)).catch(error => console.error(error));
       });
 
+      const recreateApp = async () => {
+        console.warn(`${hmrPrefix}Recreating the app...`);
+        await destroy?.();
+        delete require.cache[require.resolve('config')];
+        delete require.cache[require.resolve('@murrayju/config')];
+        delete require.cache[require.resolve('../build/server')];
+        // eslint-disable-next-line global-require, import/no-unresolved
+        ({ app, destroy } = await require('../build/server').default());
+        console.warn(`${hmrPrefix}App has been reloaded.`);
+      };
+
       // eslint-disable-next-line no-inner-declarations
       function checkForUpdate(fromUpdate) {
-        const hmrPrefix = '[\x1b[35mHMR\x1b[0m] ';
         if (!app.hot) {
           throw new Error(`${hmrPrefix}Hot Module Replacement is disabled.`);
         }
@@ -181,11 +195,7 @@ async function start(
           .catch(async error => {
             if (['abort', 'fail'].includes(app.hot.status())) {
               console.warn(`${hmrPrefix}Cannot apply update.`);
-              await destroy?.();
-              delete require.cache[require.resolve('../build/server')];
-              // eslint-disable-next-line global-require, import/no-unresolved
-              ({ app, destroy } = await require('../build/server').default());
-              console.warn(`${hmrPrefix}App has been reloaded.`);
+              await recreateApp();
             } else {
               console.warn(`${hmrPrefix}Update failed: ${error.stack || error.message}`);
             }
@@ -199,6 +209,18 @@ async function start(
             appPromiseResolve();
           });
         }
+      });
+
+      cfgWatcher = chokidar.watch(['./config/*.yml'], {
+        ignoreInitial: true,
+        ignored: /.*\._generated_\..*/,
+        usePolling: process.argv.includes('--poll-fs'),
+      });
+
+      cfgWatcher.on('all', async (event, filePath) => {
+        const src = path.relative('./', filePath);
+        buildLog(`Detected ${event} to '${src}'`);
+        await recreateApp();
       });
 
       // Wait until both client-side and server-side bundles are ready

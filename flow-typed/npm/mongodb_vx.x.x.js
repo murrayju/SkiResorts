@@ -1575,8 +1575,8 @@ declare module 'mongodb' {
     /**
      * http://mongodb.github.io/node-mongodb-native/3.1/api/Collection.html#find
      */
-    find<T>(query?: FilterQuery<TSchema>): Cursor<T>;
-    find<T>(query: FilterQuery<TSchema>, options?: FindOneOptions): Cursor<T>;
+    find<T>(): Cursor<T>;
+    find<T>(query?: FilterQuery<TSchema>, options?: FindOneOptions): Cursor<T>;
 
     /**
      * http://mongodb.github.io/node-mongodb-native/3.1/api/Collection.html#findOne

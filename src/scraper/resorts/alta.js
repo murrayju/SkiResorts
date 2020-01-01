@@ -44,17 +44,18 @@ const findNumberInTable = (tableSelector: string, col?: number = 0, row?: number
   return isNaN(num) ? undefined : num;
 };
 
+const tz = 'America/Denver';
 const weatherObservationsTable = 'main .content-wrap .container table.table';
 const weatherObservationDate = (row?: number = 0) => $ =>
   moment
     .tz(
-      `${findInTable(weatherObservationsTable, 0, row)($)} ${findInTable(
+      `${moment.tz(tz).year()} ${findInTable(weatherObservationsTable, 0, row)($)} ${findInTable(
         weatherObservationsTable,
         1,
         row,
       )($)} ${findInTable(weatherObservationsTable, 2, row)($)}`,
-      'MMMM DD h a',
-      'America/Denver',
+      'YYYY MMMM DD h a',
+      tz,
     )
     .toISOString();
 
@@ -113,11 +114,15 @@ const alta: ResortScraper = [
             .text()
             .match(/last updated (\w+) at ([^,]+),/i) || [];
         if (day && time) {
-          const ts = moment.tz(time, 'h:mmA', 'America/Denver');
+          const ts = moment.tz(
+            `${moment.tz(tz).format('YYYY-MM-DD')} ${time}`,
+            'YYYY-MM-DD h:mmA',
+            tz,
+          );
           if (day === 'yesterday') {
             ts.subtract(1, 'day');
           }
-          return ts;
+          return ts.toISOString();
         }
         return undefined;
       },

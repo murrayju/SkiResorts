@@ -1,7 +1,9 @@
 // @flow
 import config from '@murrayju/config';
 import { CronJob } from 'cron';
+import { merge } from 'lodash';
 import type { Db } from 'mongodb';
+
 import { getResortsData } from './scraper';
 import resorts from './resorts';
 import logger from '../logger';
@@ -39,13 +41,33 @@ export const createScraperCron = (db: Db) => {
           }),
         );
 
-        if (Object.keys(resortData.weather).length) {
-          await db.collection('weather').insertOne({
-            ...resortData.weather,
-            resort,
-            timestamp,
+        const reshaped = entries(resortData.weather).reduce((obj, [comboName, value]) => {
+          const [type, item] = comboName.split('_');
+          return merge(obj, {
+            [type]: {
+              [item]: value,
+            },
           });
-        }
+        }, {});
+        await Promise.all(
+          entries(reshaped).map(async ([location, data]) => {
+            const { lastUpdated, ...rest } = data;
+            const [prev] = await db
+              .collection('weather')
+              .find({ resort, location })
+              .sort({ timestamp: -1 })
+              .limit(1)
+              .toArray();
+            if (!prev || prev.lastUpdated !== lastUpdated) {
+              await db.collection('weather').insertOne({
+                resort,
+                location,
+                lastUpdated,
+                data: rest,
+              });
+            }
+          }),
+        );
       }),
     );
   };

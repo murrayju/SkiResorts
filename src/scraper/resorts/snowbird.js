@@ -1,8 +1,9 @@
 // @flow
 import { isNaN } from 'lodash';
+import moment from 'moment-timezone';
 import type { ResortScraper } from '../scraper';
 
-const windRegex = /\s*([^@]+)@([^m]+mph)/i;
+const windRegex = /\s*([^@]+)@(\d+)(?:-(\d+))?/i;
 const findCondition = (regex: RegExp) => $ =>
   $('.conditions-data .conditions > div')
     .filter((i, item) =>
@@ -25,6 +26,18 @@ const findConditionNum = (regex: RegExp) => $ => {
   return isNaN(num) ? undefined : num;
 };
 
+const tz = 'America/Denver';
+const getUpdatedTime = $ =>
+  moment
+    .tz(
+      `${moment.tz(tz).format('YYYY-MM-DD')} ${$('.conditions-header .date-display span')
+        .text()
+        .trim()}`,
+      'YYYY-MM-DD h:mm a',
+      'America/Denver',
+    )
+    .toISOString();
+
 const snowbird: ResortScraper = [
   {
     url: 'https://www.snowbird.com/mountain-report/',
@@ -43,15 +56,29 @@ const snowbird: ResortScraper = [
           .get(),
     },
     weatherSelectors: {
-      inches12hr: findConditionNum(/12hr/i),
-      inches24hr: findConditionNum(/24hr/i),
-      inches48hr: findConditionNum(/48hr/i),
-      seasonTotalInches: findConditionNum(/ytd/i),
-      baseDepthInches: findConditionNum(/depth/i),
-      currentTempMidMtnF: findConditionNum(/mid-mtn temp/i),
-      currentTempBaseF: findConditionNum(/base temp/i),
-      windSpeed: $ => findCondition(/wind speed/i)($).match(windRegex)?.[2],
-      windDirection: $ => findCondition(/wind speed/i)($).match(windRegex)?.[1],
+      summary_lastUpdated: getUpdatedTime,
+      summary_12hrSnowInches: findConditionNum(/12hr/i),
+      summary_24hrSnowInches: findConditionNum(/24hr/i),
+      summary_48hrSnowInches: findConditionNum(/48hr/i),
+      summary_seasonTotalInches: findConditionNum(/ytd/i),
+      summary_baseDepthInches: findConditionNum(/depth/i),
+      base_lastUpdated: getUpdatedTime,
+      base_tempF: findConditionNum(/mid-mtn temp/i),
+      mid_lastUpdated: getUpdatedTime,
+      mid_tempF: findConditionNum(/base temp/i),
+      top_lastUpdated: getUpdatedTime,
+      top_tempF: findConditionNum(/peak temp/i),
+      top_windSpeedMph: $ => {
+        const [, , min, max] = findCondition(/wind speed/i)($).match(windRegex) || [];
+        const result = min && max ? (parseFloat(min) + parseFloat(max)) / 2 : parseFloat(min);
+        return isNaN(result) ? undefined : result;
+      },
+      top_windGustMph: $ => {
+        const [, , , max] = findCondition(/wind speed/i)($).match(windRegex) || [];
+        const result = parseFloat(max);
+        return isNaN(result) ? undefined : result;
+      },
+      top_windDirection: $ => findCondition(/wind speed/i)($).match(windRegex)?.[1],
     },
   },
   {

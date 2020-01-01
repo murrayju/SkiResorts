@@ -18,6 +18,9 @@ db:
           resort: 1
       - key:
           timestamp: -1
+      - key:
+          name: 1
+          timestamp: -1
     lifts:
       indexes:
       - key:
@@ -44,3 +47,8 @@ scraper:
   enabled: true
   cron:
     interval: 0 */15 * * * * # every 15 minutes
+email:
+  from: ''
+  pw: ''
+  to: []
+  service: gmail

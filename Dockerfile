@@ -34,4 +34,4 @@ COPY --from=builder ["/opt/build/build/", "${appDir}/"]
 
 RUN mkdir /config
 
-CMD ["node", "./server.js"]
+CMD ["node", "./server.js", "--merge-config"]

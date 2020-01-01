@@ -3,7 +3,6 @@ import clean from './clean';
 import copy from './copy';
 import bundle from './bundle';
 import lint from './lint';
-import flow from './flow';
 import yarn from './yarn';
 import generateSrc from './generateSrc';
 
@@ -15,7 +14,6 @@ async function build(cleanDeps = process.argv.includes('--clean-deps')) {
   await run(clean, cleanDeps);
   await run(yarn);
   await run(lint);
-  await run(flow);
   await run(copy);
   await run(generateSrc);
   await run(bundle);

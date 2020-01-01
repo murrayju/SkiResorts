@@ -13,7 +13,6 @@ import webpackConfig from './webpack.config';
 import run from './run';
 import clean from './clean';
 import lint from './lint';
-import flow from './flow';
 import { runDbContainer, dockerTeardown } from './docker';
 
 const isDebug = !process.argv.includes('--release');
@@ -61,7 +60,6 @@ async function start(
 ) {
   // initial lint
   await run(lint);
-  await run(flow);
 
   // Doesn't resolve until kill signal sent
   // eslint-disable-next-line no-async-promise-executor

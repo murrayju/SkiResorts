@@ -1,24 +1,13 @@
-import { CLIEngine } from 'eslint';
-import { buildLog } from 'build-strap';
+import { run, buildLog } from 'build-strap';
+import eslint from './eslint';
+import flow from './flow';
 
 // Lint the source using eslint
-export default async function lint(autoFix = !process.argv.includes('--lint-no-fix')) {
+export default async function lint() {
   if (process.argv.includes('--no-lint')) {
     buildLog('Skipping due to --no-lint');
-    return null;
+    return;
   }
-  const engine = new CLIEngine({ fix: autoFix });
-  const report = engine.executeOnFiles(['./src/', './tools/']);
-  if (autoFix) {
-    buildLog(`applying automatic eslint fixes`);
-    CLIEngine.outputFixes(report);
-  }
-  if (report.errorCount || report.warningCount) {
-    const formatter = engine.getFormatter();
-    buildLog(`eslint results:\n${formatter(report.results)}`);
-  }
-  if (report.errorCount) {
-    throw new Error('Linting failed');
-  }
-  return report;
+  await run(eslint);
+  await run(flow);
 }

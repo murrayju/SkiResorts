@@ -2,6 +2,7 @@
 import config from '@murrayju/config';
 import { CronJob } from 'cron';
 import { merge } from 'lodash';
+import moment from 'moment';
 
 import { getResortsData } from './scraper';
 import resorts from './resorts';
@@ -53,18 +54,23 @@ export const createScraperCron = ({ db, emitter }: ServerContext) => {
         }, {});
         await Promise.all(
           entries(reshaped).map(async ([location, data]) => {
-            const { lastUpdated, ...rest } = data;
+            const { lastUpdated: reportedLastUpdated, ...rest } = data;
+            const lastUpdated = moment(reportedLastUpdated).isAfter(timestamp)
+              ? timestamp
+              : reportedLastUpdated;
             const [prev] = await db
               .collection('weather')
               .find({ resort, location })
               .sort({ lastUpdated: -1 })
               .limit(1)
               .toArray();
-            if (!prev || prev.lastUpdated !== lastUpdated) {
+            if (!prev || !moment(prev.lastUpdated).isSame(lastUpdated)) {
               await db.collection('weather').insertOne({
                 resort,
                 location,
-                lastUpdated,
+                lastUpdated: moment(lastUpdated).toDate(),
+                reportedLastUpdated: moment(reportedLastUpdated).toDate(),
+                timestamp,
                 data: rest,
               });
             }

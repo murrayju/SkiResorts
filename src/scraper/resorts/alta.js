@@ -88,23 +88,67 @@ const alta: ResortScraper = [
           .get()
           .filter(item => item !== 'CLOSED'),
       areas_open: $ =>
-        $('#expected-openings ~ .table-weather td:has(.open-status-open)')
-          .map((i, item) =>
-            $(item)
-              .prev()
+        $('#expected-openings ~ .table-weather tbody tr')
+          .filter((i, row) =>
+            /open/i.test(
+              $(row)
+                .children('td')
+                .eq(1)
+                .text()
+                .trim(),
+            ),
+          )
+          .map((i, row) =>
+            $(row)
+              .children('td')
+              .first()
               .text(),
           )
-          .get()
-          .filter(item => item !== 'OPEN'),
+          .get(),
       areas_closed: $ =>
-        $('#expected-openings ~ .table-weather td:has(.open-status-closed)')
-          .map((i, item) =>
-            $(item)
-              .prev()
+        $('#expected-openings ~ .table-weather tbody tr')
+          .filter(
+            (i, row) =>
+              /closed/i.test(
+                $(row)
+                  .children('td')
+                  .eq(1)
+                  .text()
+                  .trim(),
+              ) &&
+              !$(row)
+                .children('td.route-progress')
+                .has('.fa-check').length,
+          )
+          .map((i, row) =>
+            $(row)
+              .children('td')
+              .first()
               .text(),
           )
-          .get()
-          .filter(item => item !== 'CLOSED'),
+          .get(),
+      areas_pending: $ =>
+        $('#expected-openings ~ .table-weather tbody tr')
+          .filter(
+            (i, row) =>
+              /closed/i.test(
+                $(row)
+                  .children('td')
+                  .eq(1)
+                  .text()
+                  .trim(),
+              ) &&
+              $(row)
+                .children('td.route-progress')
+                .has('.fa-check').length,
+          )
+          .map((i, row) =>
+            $(row)
+              .children('td')
+              .first()
+              .text(),
+          )
+          .get(),
     },
     weatherSelectors: {
       summary_lastUpdated: $ => {

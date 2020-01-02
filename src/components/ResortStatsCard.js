@@ -54,7 +54,6 @@ const ResortStatsCard = ({ resort, graphHeight }: Props) => {
   }, [numLines]);
 
   const now = moment();
-  const lastWeek = moment(now).subtract(10, 'days');
   const lastYear = moment(now).subtract(1, 'year');
 
   const resortData = flow(
@@ -99,7 +98,6 @@ const ResortStatsCard = ({ resort, graphHeight }: Props) => {
             hidden: area !== primary,
             data: [
               ...flow(
-                filter(t => moment(t.timestamp).isAfter(lastWeek)),
                 map(t => ({
                   x: t.timestamp,
                   y: t.status,

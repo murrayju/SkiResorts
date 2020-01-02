@@ -8,6 +8,7 @@ import config from '@murrayju/config';
 import { getResortsData, getResortData } from '../scraper/scraper';
 import resorts from '../scraper/resorts';
 import aggregator from './aggregator';
+import weatherAggregator from './weatherAggregator';
 // $FlowFixMe - generated file
 import { version } from '../version._generated_'; // eslint-disable-line import/no-unresolved
 import logger from '../logger';
@@ -68,11 +69,22 @@ export default function(serverContext: ServerContext) {
     res.json(await getResortData(resort));
   });
 
+  router.get('/stats/weather', async (req: ApiRequest, res) => {
+    const { limitUnit = 'days', limitVal = 10 } = req.query;
+    res.json(
+      await serverContext.db
+        .collection('weather')
+        .aggregate(weatherAggregator({ limit: [limitVal, limitUnit] }), { allowDiskUse: true })
+        .toArray(),
+    );
+  });
+
   router.get('/stats/:thing', async (req: ApiRequest, res) => {
+    const { limitUnit = 'days', limitVal = 10 } = req.query;
     res.json(
       await serverContext.db
         .collection(req.params.thing)
-        .aggregate(aggregator, { allowDiskUse: true })
+        .aggregate(aggregator({ limit: [limitVal, limitUnit] }), { allowDiskUse: true })
         .toArray(),
     );
   });

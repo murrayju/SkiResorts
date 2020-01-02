@@ -1,4 +1,15 @@
-export default [
+import moment from 'moment';
+
+export default ({ limit }) => [
+  {
+    $match: {
+      timestamp: {
+        $gt: moment()
+          .subtract(...limit)
+          .toDate(),
+      },
+    },
+  },
   {
     $sort: {
       timestamp: 1,

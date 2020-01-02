@@ -63,9 +63,9 @@ const snowbird: ResortScraper = [
       summary_seasonTotalInches: findConditionNum(/ytd/i),
       summary_baseDepthInches: findConditionNum(/depth/i),
       base_lastUpdated: getUpdatedTime,
-      base_tempF: findConditionNum(/mid-mtn temp/i),
+      base_tempF: findConditionNum(/base temp/i),
       mid_lastUpdated: getUpdatedTime,
-      mid_tempF: findConditionNum(/base temp/i),
+      mid_tempF: findConditionNum(/mid-mtn temp/i),
       top_lastUpdated: getUpdatedTime,
       top_tempF: findConditionNum(/peak temp/i),
       top_windSpeedMph: $ => {

@@ -5,7 +5,6 @@ import styled from 'styled-components';
 
 import Icon from './Icon';
 import { withLink } from './Link';
-import useVersion from '../hooks/useVersion';
 import AppContext from '../contexts/AppContext';
 
 const NavItemLinkStyled = styled(withLink()(NavItem))`
@@ -28,25 +27,22 @@ const SidebarStyled = styled.div`
   overflow-y: auto;
 `;
 
-const Sidebar = () => {
-  const [version] = useVersion();
-
-  return (
-    <SidebarStyled>
-      <Nav stacked className="nav-pills">
-        <NavItemLink to="/">
-          <Icon name="mountain" pad="md" fw /> Areas
-        </NavItemLink>
-        <NavItemLink to="/lifts">
-          <Icon name="tram" pad="md" fw /> Lifts
-        </NavItemLink>
-        <NavItemLink to="/runs">
-          <Icon name="road" pad="md" fw /> Runs
-        </NavItemLink>
-        {version ? <NavItem disabled>v{version}</NavItem> : null}
-      </Nav>
-    </SidebarStyled>
-  );
-};
-
+const Sidebar = () => (
+  <SidebarStyled>
+    <Nav stacked className="nav-pills">
+      <NavItemLink to="/">
+        <Icon name="mountain" pad="md" fw /> Areas
+      </NavItemLink>
+      <NavItemLink to="/lifts">
+        <Icon name="tram" pad="md" fw /> Lifts
+      </NavItemLink>
+      <NavItemLink to="/runs">
+        <Icon name="road" pad="md" fw /> Runs
+      </NavItemLink>
+      <NavItemLink to="/weather">
+        <Icon name="snowflake" pad="md" fw /> Weather
+      </NavItemLink>
+    </Nav>
+  </SidebarStyled>
+);
 export default Sidebar;

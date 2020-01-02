@@ -272,8 +272,8 @@ const alta: ResortScraper = [
       mid_tempF: findNumberInTable(weatherObservationsTable, 3),
       mid_12hrSnowInches: findNumberInTable(weatherObservationsTable, 4),
       mid_baseDepthInches: findNumberInTable(weatherObservationsTable, 5),
-      mid_hourlySnowInches: findNumberInTable(weatherObservationsTable, 6),
-      mid_snowSince4amInches: findNumberInTable(weatherObservationsTable, 7),
+      mid_hourlyWaterInches: findNumberInTable(weatherObservationsTable, 6),
+      mid_waterSince4amInches: findNumberInTable(weatherObservationsTable, 7),
     },
   },
   {

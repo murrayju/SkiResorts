@@ -5,7 +5,9 @@ import moment from 'moment-timezone';
 import type { ResortScraper } from '../scraper';
 
 const findInHTable = (tableSelector: string, heading: RegExp, col?: number = 0) => ($): string =>
-  $(`${tableSelector} tr`)
+  $(tableSelector)
+    .first()
+    .find('tr')
     .filter((i, item) =>
       heading.test(
         $(item)
@@ -30,7 +32,9 @@ const findNumberInHTable = (tableSelector: string, heading: RegExp, col?: number
 };
 
 const findInTable = (tableSelector: string, col?: number = 0, row?: number = 0) => ($): string =>
-  $(`${tableSelector} > tbody > tr`)
+  $(tableSelector)
+    .first()
+    .find('> tbody > tr')
     .eq(row)
     .children('td')
     .eq(col)
@@ -64,31 +68,72 @@ const alta: ResortScraper = [
     url: 'https://www.alta.com/conditions/daily-mountain-report/snow-report',
     statusSelectors: {
       lifts_open: $ =>
-        $('#lift-status ~ .table-weather td:has(.fa-open)')
+        $('#lift-status ~ .table-weather tbody')
+          .first()
+          .children('tr')
+          .filter((i, row) => $(row).has('td .fa-open.fa-check').length)
           .map(
-            (i, item) =>
-              $(item)
-                .prev()
+            (i, row) =>
+              $(row)
+                .children('td')
+                .first()
                 .text()
                 .trim()
                 .split('\n')[0],
           )
-          .get()
-          .filter(item => item !== 'OPEN'),
+          .get(),
       lifts_closed: $ =>
-        $('#lift-status ~ .table-weather td:has(.fa-closed)')
+        $('#lift-status ~ .table-weather tbody')
+          .first()
+          .children('tr')
+          .filter(
+            (i, row) =>
+              $(row).has('td .fa-closed.fa-ban').length &&
+              !/delayed/i.test(
+                $(row)
+                  .children('td')
+                  .first()
+                  .text(),
+              ),
+          )
           .map(
-            (i, item) =>
-              $(item)
-                .prev()
+            (i, row) =>
+              $(row)
+                .children('td')
+                .first()
                 .text()
                 .trim()
                 .split('\n')[0],
           )
-          .get()
-          .filter(item => item !== 'CLOSED'),
+          .get(),
+      lifts_pending: $ =>
+        $('#lift-status ~ .table-weather tbody')
+          .first()
+          .children('tr')
+          .filter(
+            (i, row) =>
+              $(row).has('td .fa-closed.fa-ban').length &&
+              /delayed/i.test(
+                $(row)
+                  .children('td')
+                  .first()
+                  .text(),
+              ),
+          )
+          .map(
+            (i, row) =>
+              $(row)
+                .children('td')
+                .first()
+                .text()
+                .trim()
+                .split('\n')[0],
+          )
+          .get(),
       areas_open: $ =>
-        $('#expected-openings ~ .table-weather tbody tr')
+        $('#expected-openings ~ .table-weather tbody')
+          .first()
+          .children('tr')
           .filter((i, row) =>
             /open/i.test(
               $(row)
@@ -106,7 +151,9 @@ const alta: ResortScraper = [
           )
           .get(),
       areas_closed: $ =>
-        $('#expected-openings ~ .table-weather tbody tr')
+        $('#expected-openings ~ .table-weather tbody')
+          .first()
+          .children('tr')
           .filter(
             (i, row) =>
               /closed/i.test(
@@ -128,7 +175,9 @@ const alta: ResortScraper = [
           )
           .get(),
       areas_pending: $ =>
-        $('#expected-openings ~ .table-weather tbody tr')
+        $('#expected-openings ~ .table-weather tbody')
+          .first()
+          .children('tr')
           .filter(
             (i, row) =>
               /closed/i.test(

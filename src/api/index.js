@@ -3,6 +3,7 @@ import Router from 'express-promise-router';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import uuid from 'uuid/v4';
+import config from '@murrayju/config';
 
 import { getResortsData, getResortData } from '../scraper/scraper';
 import resorts from '../scraper/resorts';
@@ -24,8 +25,6 @@ export type ApiRequest = {
   query: { [string]: string },
   ski: ApiRequestContext,
 };
-
-const isDebug = process.env.NODE_ENV !== 'production';
 
 // Middleware factory
 export default function(serverContext: ServerContext) {
@@ -78,7 +77,7 @@ export default function(serverContext: ServerContext) {
     );
   });
 
-  if (isDebug) {
+  if (config.get('server.testApis')) {
     router.post('/test/message', async (req: ApiRequest, res) => {
       serverContext.emitter.emit(req.body.event, ...req.body.args);
       res.status(200).send();

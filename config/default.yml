@@ -4,6 +4,7 @@ server:
   serverUrl: ''
   clientUrl: ''
   trustProxy: loopback
+  testApis: true
 db:
   url: mongodb://localhost:27018
   name: skidb

@@ -71,11 +71,11 @@ const ResortStatsCard = ({ resort, graphHeight }: Props) => {
   )(resort.data);
   const closed = flow(
     filter(a => a.status === 'closed'),
-    orderBy(['lastOpen', 'lastPending', 'lastClosed'], ['desc', 'desc', 'desc']),
+    orderBy(['lastOpen', 'lastPending', 'lastClosed'], ['asc', 'desc', 'desc']),
   )(resortData);
   const pending = flow(
     filter(a => a.status === 'pending'),
-    orderBy(['lastOpen', 'lastClosed'], ['desc', 'desc']),
+    orderBy(['lastOpen', 'lastClosed'], ['asc', 'desc']),
   )(resortData);
   const open = flow(
     filter(a => a.status === 'open'),

@@ -4,6 +4,11 @@ import moment from 'moment-timezone';
 
 import type { ResortScraper } from '../scraper';
 
+const maybeFloat = (str: mixed): void | number => {
+  const num = parseFloat(str);
+  return isNaN(num) ? undefined : num;
+};
+
 const findInHTable = (tableSelector: string, heading: RegExp, col?: number = 0) => ($): string =>
   $(tableSelector)
     .first()
@@ -26,10 +31,7 @@ const findInHTable = (tableSelector: string, heading: RegExp, col?: number = 0) 
 
 const findNumberInHTable = (tableSelector: string, heading: RegExp, col?: number = 0) => (
   $,
-): ?number => {
-  const num = parseFloat(findInHTable(tableSelector, heading, col)($));
-  return isNaN(num) ? undefined : num;
-};
+): ?number => maybeFloat(findInHTable(tableSelector, heading, col)($));
 
 const findInTable = (tableSelector: string, col?: number = 0, row?: number = 0) => ($): string =>
   $(tableSelector)
@@ -43,10 +45,7 @@ const findInTable = (tableSelector: string, col?: number = 0, row?: number = 0) 
 
 const findNumberInTable = (tableSelector: string, col?: number = 0, row?: number = 0) => (
   $,
-): ?number => {
-  const num = parseFloat(findInTable(tableSelector, col, row)($));
-  return isNaN(num) ? undefined : num;
-};
+): ?number => maybeFloat(findInTable(tableSelector, col, row)($));
 
 const tz = 'America/Denver';
 const weatherObservationsTable = 'main .content-wrap .container table.table';
@@ -219,13 +218,21 @@ const alta: ResortScraper = [
         }
         return undefined;
       },
-      summary_snowSince4amInches: findNumberInHTable(
-        '#snow-fall ~ .table-weather',
-        /since 4am today/i,
-      ),
+      summary_snowSince4amInches: $ =>
+        findNumberInHTable('#snow-fall ~ .table-weather', /since 4am today/i)($) ??
+        maybeFloat(
+          $('#snow-fall ~ .table-weather tfoot')
+            .first()
+            .text()
+            .match(/(\d+)[”"] since today at 4:00\s*am/i)?.[1],
+        ),
       summary_snowSince4pmYesterdayInches: findNumberInHTable(
         '#snow-fall ~ .table-weather',
         /since 4pm yesterday/i,
+      ),
+      summary_snowSince4amYesterdayInches: findNumberInHTable(
+        '#snow-fall ~ .table-weather',
+        /since 4am yesterday/i,
       ),
       summary_stormTotalInches: findNumberInHTable('#snow-fall ~ .table-weather', /storm total/i),
       summary_seasonTotalInches: findNumberInHTable('#snow-fall ~ .table-weather', /season total/i),

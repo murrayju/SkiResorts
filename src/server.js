@@ -71,7 +71,7 @@ const createApp = async () => {
   dataListener(serverContext);
   alertListener(serverContext);
 
-  app.use('/api', api(db));
+  app.use('/api', api(serverContext));
 
   const port = config.get('server.port');
   const serverUrl = config.get('server.serverUrl') || `http://localhost:${port}`;

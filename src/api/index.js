@@ -1,7 +1,6 @@
 // @flow
 import Router from 'express-promise-router';
 import cors from 'cors';
-import type { Db } from 'mongodb';
 import cookieParser from 'cookie-parser';
 import uuid from 'uuid/v4';
 
@@ -11,11 +10,12 @@ import aggregator from './aggregator';
 // $FlowFixMe - generated file
 import { version } from '../version._generated_'; // eslint-disable-line import/no-unresolved
 import logger from '../logger';
+import type { ServerContext } from '../server';
 
 export type ApiRequestContext = {
   correlationId: string,
   clientId: string,
-  db: Db,
+  serverContext: ServerContext,
 };
 
 export type ApiRequest = {
@@ -25,8 +25,10 @@ export type ApiRequest = {
   ski: ApiRequestContext,
 };
 
+const isDebug = process.env.NODE_ENV !== 'production';
+
 // Middleware factory
-export default function(db: Db) {
+export default function(serverContext: ServerContext) {
   const router = Router();
 
   router.use(cors());
@@ -40,7 +42,7 @@ export default function(db: Db) {
     req.ski = {
       correlationId: uuid(),
       clientId,
-      db,
+      serverContext,
     };
     res.ski = {};
     next();
@@ -69,12 +71,19 @@ export default function(db: Db) {
 
   router.get('/stats/:thing', async (req: ApiRequest, res) => {
     res.json(
-      await db
+      await serverContext.db
         .collection(req.params.thing)
         .aggregate(aggregator, { allowDiskUse: true })
         .toArray(),
     );
   });
+
+  if (isDebug) {
+    router.post('/test/message', async (req: ApiRequest, res) => {
+      serverContext.emitter.emit(req.body.event, ...req.body.args);
+      res.status(200).send();
+    });
+  }
 
   // Custom error handler
   router.use(

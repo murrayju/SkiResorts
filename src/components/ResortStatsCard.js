@@ -99,12 +99,12 @@ const ResortStatsCard = ({ resort, graphHeight }: Props) => {
             data: [
               ...flow(
                 map(t => ({
-                  x: t.timestamp,
+                  x: moment(t.timestamp),
                   y: t.status,
                 })),
               )(area.transitions),
               {
-                x: area.updated || now,
+                x: moment(area.updated || now),
                 y: area.status || 'unknown',
               },
             ],
@@ -122,7 +122,11 @@ const ResortStatsCard = ({ resort, graphHeight }: Props) => {
               {
                 type: 'time',
                 time: {
-                  unit: 'day',
+                  unit: 'hour',
+                  unitStepSize: 6,
+                  displayFormats: {
+                    hour: 'hA ddd',
+                  },
                 },
               },
             ],

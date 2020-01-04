@@ -46,6 +46,10 @@ export const createScraperCron = ({ db, emitter }: ServerContext) => {
           );
 
           const reshaped = entries(resortData.weather).reduce((obj, [comboName, value]) => {
+            if (value == null) {
+              // filter out null/undefined values
+              return obj;
+            }
             const [type, item] = comboName.split('_');
             return merge(obj, {
               [type]: {

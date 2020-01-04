@@ -1,7 +1,7 @@
 // @flow
 import React, { useState, useEffect } from 'react';
 import randomColor from 'randomcolor';
-import { flow, map } from 'lodash/fp';
+import { flow, map, filter } from 'lodash/fp';
 import moment from 'moment';
 
 import Paper from './Paper';
@@ -135,6 +135,7 @@ const ResortStatsCard = ({ resort, graphHeight }: Props) => {
                 borderColor: colors[i],
                 yAxisID: axis || (ownAxis ? prop : 'default'),
                 data: flow(
+                  filter(t => t[prop] != null),
                   map(t => ({
                     x: moment(t.lastUpdated),
                     y: t[prop],

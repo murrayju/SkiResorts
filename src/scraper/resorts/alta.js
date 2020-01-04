@@ -4,9 +4,9 @@ import moment from 'moment-timezone';
 
 import type { ResortScraper } from '../scraper';
 
-const maybeFloat = (str: mixed): void | number => {
+const maybeFloat = (str: mixed): ?number => {
   const num = parseFloat(str);
-  return isNaN(num) ? undefined : num;
+  return isNaN(num) ? null : num;
 };
 
 const findInHTable = (tableSelector: string, heading: RegExp, col?: number = 0) => ($): string =>
@@ -216,7 +216,7 @@ const alta: ResortScraper = [
           }
           return ts.toISOString();
         }
-        return undefined;
+        return null;
       },
       summary_snowSince4amInches: $ =>
         findNumberInHTable('#snow-fall ~ .table-weather', /since 4am today/i)($) ??

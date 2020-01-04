@@ -3,6 +3,11 @@ import { isNaN } from 'lodash';
 import moment from 'moment-timezone';
 import type { ResortScraper } from '../scraper';
 
+const maybeFloat = (str: mixed): ?number => {
+  const num = parseFloat(str);
+  return isNaN(num) ? null : num;
+};
+
 const windRegex = /\s*([^@]+)@(\d+)(?:-(\d+))?/i;
 const findCondition = (regex: RegExp) => $ =>
   $('.conditions-data .conditions > div')
@@ -21,10 +26,7 @@ const findCondition = (regex: RegExp) => $ =>
     )
     .get()[0];
 
-const findConditionNum = (regex: RegExp) => $ => {
-  const num = parseFloat(findCondition(regex)($));
-  return isNaN(num) ? undefined : num;
-};
+const findConditionNum = (regex: RegExp) => $ => maybeFloat(findCondition(regex)($));
 
 const tz = 'America/Denver';
 const getUpdatedTime = $ =>
@@ -71,12 +73,11 @@ const snowbird: ResortScraper = [
       top_windSpeedMph: $ => {
         const [, , min, max] = findCondition(/wind speed/i)($).match(windRegex) || [];
         const result = min && max ? (parseFloat(min) + parseFloat(max)) / 2 : parseFloat(min);
-        return isNaN(result) ? undefined : result;
+        return isNaN(result) ? null : result;
       },
       top_windGustMph: $ => {
         const [, , , max] = findCondition(/wind speed/i)($).match(windRegex) || [];
-        const result = parseFloat(max);
-        return isNaN(result) ? undefined : result;
+        return maybeFloat(max);
       },
       top_windDirection: $ => findCondition(/wind speed/i)($).match(windRegex)?.[1],
     },

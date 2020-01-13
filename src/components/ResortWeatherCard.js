@@ -6,6 +6,7 @@ import moment from 'moment';
 
 import Paper from './Paper';
 import LineGraph from './LineGraph';
+import { FormGroupFlowBox } from './flex';
 
 type WeatherData = {
   lastUpdated: string,
@@ -31,7 +32,7 @@ type WeatherData = {
   humidity?: ?number,
 };
 
-type ResortStats = {
+type ResortWeather = {
   _id: string,
   summary: WeatherData[],
   base: WeatherData[],
@@ -40,7 +41,7 @@ type ResortStats = {
 };
 
 type Props = {
-  resort: ResortStats,
+  resort: ResortWeather,
   graphHeight?: number,
 };
 
@@ -57,8 +58,20 @@ type Graph = {
   data: GraphLine[],
 };
 
-const ResortStatsCard = ({ resort, graphHeight }: Props) => {
+const timeChoices = {
+  '10d': { value: 10, unit: 'day', unitStepSize: 1 },
+  '5d': { value: 5, unit: 'day', unitStepSize: 1 },
+  '48h': { value: 48, unit: 'hour', unitStepSize: 2 },
+  '24h': { value: 24, unit: 'hour', unitStepSize: 2 },
+  '12h': { value: 12, unit: 'hour', unitStepSize: 1 },
+};
+
+const ResortWeatherCard = ({ resort, graphHeight }: Props) => {
   const [colors, setColors] = useState([]);
+  const [timeChoice, setTimeChoice] = useState('48h');
+
+  const { value: timeValue, unit, unitStepSize } = timeChoices[timeChoice];
+  const timeLimit = moment().subtract(timeValue, unit);
 
   const numLines = 20;
   useEffect(() => {
@@ -123,6 +136,23 @@ const ResortStatsCard = ({ resort, graphHeight }: Props) => {
   return (
     <Paper>
       <h2>{resort._id}</h2>
+      <FormGroupFlowBox>
+        {Object.keys(timeChoices).map(k => (
+          <label key={k} htmlFor={k} css="padding-left: 10px;">
+            <input
+              css="&& { margin-right: 5px; }"
+              type="radio"
+              id={k}
+              value={k}
+              checked={timeChoice === k}
+              onChange={({ currentTarget: { value } }) => {
+                setTimeChoice(value);
+              }}
+            />
+            {k}
+          </label>
+        ))}
+      </FormGroupFlowBox>
       {graphs.map(graph => (
         <LineGraph
           key={graph.name}
@@ -135,7 +165,7 @@ const ResortStatsCard = ({ resort, graphHeight }: Props) => {
                 borderColor: colors[i],
                 yAxisID: axis || (ownAxis ? prop : 'default'),
                 data: flow(
-                  filter(t => t[prop] != null),
+                  filter(t => t[prop] != null && moment(t.lastUpdated).isAfter(timeLimit)),
                   map(t => ({
                     x: moment(t.lastUpdated),
                     y: t[prop],
@@ -149,8 +179,8 @@ const ResortStatsCard = ({ resort, graphHeight }: Props) => {
                 {
                   type: 'time',
                   time: {
-                    unit: 'hour',
-                    unitStepSize: 6,
+                    unit,
+                    unitStepSize,
                     displayFormats: {
                       hour: 'hA ddd',
                     },
@@ -172,8 +202,8 @@ const ResortStatsCard = ({ resort, graphHeight }: Props) => {
     </Paper>
   );
 };
-ResortStatsCard.defaultProps = {
+ResortWeatherCard.defaultProps = {
   graphHeight: 400,
 };
 
-export default ResortStatsCard;
+export default ResortWeatherCard;

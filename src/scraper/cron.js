@@ -17,14 +17,16 @@ export const createScraperCron = ({ db, emitter }: ServerContext) => {
       return;
     }
     try {
-      const rawData = await getResortsData(resorts);
-      logger.debug('Fetched raw data' /* , { rawData } */);
-
-      const timestamp = new Date();
+      const rawResortsData = await getResortsData(resorts);
+      logger.debug('Fetched raw data' /* , { rawResortsData } */);
 
       // $FlowFixMe
       await Promise.allSettled(
-        entries(rawData).map(async ([resort, resortData]) => {
+        entries(rawResortsData).map(async ([resort, resortData]) => {
+          const { timestamp = new Date(), url, rawResponse, rawData } = resortData;
+          // record the raw data
+          await db.collection('raw').insertOne({ timestamp, url, rawResponse, rawData, resort });
+
           // $FlowFixMe
           await Promise.allSettled(
             entries(resortData.status).map(async ([comboName, values]) => {
@@ -61,7 +63,9 @@ export const createScraperCron = ({ db, emitter }: ServerContext) => {
           await Promise.allSettled(
             entries(reshaped).map(async ([location, scrapedData]) => {
               const { lastUpdated: reportedLastUpdatedStr, ...data } = scrapedData;
-              const reportedLastUpdated = moment(reportedLastUpdatedStr);
+              const reportedLastUpdated = reportedLastUpdatedStr
+                ? moment(reportedLastUpdatedStr)
+                : null;
 
               const [prev] = await db
                 .collection('weather')
@@ -73,6 +77,8 @@ export const createScraperCron = ({ db, emitter }: ServerContext) => {
               const dataUnchanged =
                 // there is a previous entry
                 prev &&
+                // there is a reported time
+                reportedLastUpdated &&
                 // they have the same scraped timestamp
                 reportedLastUpdated.isSame(prev.reportedLastUpdated) &&
                 // the rest of the scraped data is the same
@@ -84,11 +90,12 @@ export const createScraperCron = ({ db, emitter }: ServerContext) => {
                   location,
                   data,
                   // if reported time is nonsense (in the future), use current time
-                  lastUpdated: reportedLastUpdated.isAfter(timestamp)
-                    ? timestamp
-                    : reportedLastUpdated.toDate(),
+                  lastUpdated:
+                    !reportedLastUpdated || reportedLastUpdated.isAfter(timestamp)
+                      ? timestamp
+                      : reportedLastUpdated.toDate(),
                   // just so we can see when the scraped dates were nonsense
-                  reportedLastUpdated: reportedLastUpdated.toDate(),
+                  reportedLastUpdated: reportedLastUpdated?.toDate() || null,
                   timestamp,
                 });
               }

@@ -159,7 +159,7 @@ const ResortWeatherCard = ({ resort, graphHeight }: Props) => {
           height={graphHeight}
           data={{
             datasets: graph.data
-              .filter(({ src, prop }) => src.some(d => d[prop] != null))
+              .filter(({ src, prop }) => src?.some(d => d[prop] != null))
               .map(({ label, src, prop, axis, ownAxis }, i) => ({
                 label,
                 borderColor: colors[i],

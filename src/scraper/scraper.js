@@ -13,9 +13,14 @@ export type PageScraper = {|
   weatherSelectors?: {
     [string]: ($: Function) => ?(string | number | void),
   },
+  customFn?: ($: Function, url: string) => Promise<{ [string]: any }>,
 |};
 
 export type ScraperResult = {
+  url: string,
+  timestamp: Date,
+  rawResponse: string,
+  rawData?: any,
   status: {
     [string]: string[],
   },
@@ -38,15 +43,22 @@ export const getPageData = async ({
   url,
   statusSelectors,
   weatherSelectors,
+  customFn,
 }: PageScraper): Promise<ScraperResult> => {
-  const $ = await fetch(url)
-    .then(r => r.text())
-    .then(html => cheerio.load(html));
+  const rawResponse = await fetch(url).then(r => r.text());
+  const $ = await cheerio.load(rawResponse);
 
-  return {
+  const scrapedData = {
+    url,
+    timestamp: new Date(),
+    rawResponse,
     status: mapValues(s => s($))(statusSelectors),
     weather: mapValues(s => s($))(weatherSelectors),
   };
+
+  const customData = (customFn && (await customFn($, url))) || {};
+
+  return merge(scrapedData, customData);
 };
 
 export const getResortData = async (resortPages: ResortScraper): Promise<ScraperResult> => {

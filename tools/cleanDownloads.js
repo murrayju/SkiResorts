@@ -1,4 +1,4 @@
-import { clean, buildLog } from 'build-strap';
+import { buildLog, clean } from 'build-strap';
 
 export default async function cleanDownloads() {
   if (process.argv.includes('--no-clean-downloads')) {

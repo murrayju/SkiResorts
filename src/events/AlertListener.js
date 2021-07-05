@@ -1,5 +1,6 @@
-import nodemailer from 'nodemailer';
 import config from '@murrayju/config';
+import nodemailer from 'nodemailer';
+
 import logger from '../logger';
 
 export default ({ emitter }) => {
@@ -12,7 +13,7 @@ export default ({ emitter }) => {
       pass: pw,
     },
   });
-  emitter.on('AREA_OPENED', data => {
+  emitter.on('AREA_OPENED', (data) => {
     if (!to?.length) {
       logger.debug('No email configured');
       return;
@@ -24,7 +25,7 @@ export default ({ emitter }) => {
       text: `${data.name} at ${data.resort} is now: ${data.status}`,
     };
     logger.debug('Sending AREA_OPENED email', mailOptions);
-    transporter.sendMail(mailOptions, function(error, info) {
+    transporter.sendMail(mailOptions, function (error, info) {
       if (error) {
         logger.error(error);
       } else {

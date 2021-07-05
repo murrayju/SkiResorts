@@ -1,5 +1,5 @@
-import { CLIEngine } from 'eslint';
 import { buildLog } from 'build-strap';
+import { CLIEngine } from 'eslint';
 
 // Lint the source using eslint
 export default async function eslint(autoFix = !process.argv.includes('--eslint-no-fix')) {

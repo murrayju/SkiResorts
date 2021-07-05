@@ -1,5 +1,5 @@
-import { CLIEngine } from 'eslint';
 import { buildLog, getVersionCode } from 'build-strap';
+import { CLIEngine } from 'eslint';
 import fs from 'fs-extra';
 
 // Pass the generated code through eslint,

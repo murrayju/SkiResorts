@@ -1464,12 +1464,12 @@ const Icon: React.ComponentType<Props> = styled.i.attrs(
       stack && `fa-stack-${stack}`,
       bsStyle && `text-${bsStyle}`,
     ]
-      .filter(c => c)
+      .filter((c) => c)
       .join(' '),
   }),
 )`
   font-size: ${({ size }: IconProps) => (typeof size === 'number' ? `${size}px` : size)};
-  color: ${props => propsColor(props)};
+  color: ${(props) => propsColor(props)};
   padding: 0
     ${({ pad, smPad, mdPad, lgPad }: IconProps) =>
       pad === 'sm' && !!smPad

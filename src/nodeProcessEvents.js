@@ -4,9 +4,9 @@
 let registered = false;
 const unhandledRejections = new Map();
 
-const exitHandler = code => console.info(`Process exiting with code: ${code}`);
-const warningHandler = error => console.warn(`Node<warning>: ${error?.message}`, error);
-const uncaughtExceptionHandler = error => {
+const exitHandler = (code) => console.info(`Process exiting with code: ${code}`);
+const warningHandler = (error) => console.warn(`Node<warning>: ${error?.message}`, error);
+const uncaughtExceptionHandler = (error) => {
   console.error('Node<uncaughtException>', error);
   // Process must exit
   setImmediate(() => process.exit(1));
@@ -24,7 +24,7 @@ const unhandledRejectionHandler = (reason, promise) => {
     count: unhandledRejections.size,
   });
 };
-const rejectionHandledHandler = promise => {
+const rejectionHandledHandler = (promise) => {
   unhandledRejections.delete(promise);
   console.info('Node<rejectionHandled>', {
     promise,

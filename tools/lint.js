@@ -1,4 +1,5 @@
-import { run, buildLog } from 'build-strap';
+import { buildLog, run } from 'build-strap';
+
 import eslint from './eslint';
 // import flow from './flow';
 

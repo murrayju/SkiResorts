@@ -1,35 +1,35 @@
 // @flow
 import config from '@murrayju/config';
-import path from 'path';
-import express from 'express';
-import nodeFetch from 'node-fetch';
-import React from 'react';
-import ReactDOM from 'react-dom/server';
-import { CookiesProvider } from 'react-cookie';
-import cookiesMiddleware from 'universal-cookie-express';
-import PrettyError from 'pretty-error';
-import { ServerStyleSheet, StyleSheetManager } from 'styled-components';
-import { renderStylesToString } from 'emotion-server';
 import bodyParser from 'body-parser';
-import type { Db, MongoClient } from 'mongodb';
 import { type CronJob } from 'cron';
+import { renderStylesToString } from 'emotion-server';
+import express from 'express';
+import type { Db, MongoClient } from 'mongodb';
+import nodeFetch from 'node-fetch';
+import path from 'path';
+import PrettyError from 'pretty-error';
+import React from 'react';
+import { CookiesProvider } from 'react-cookie';
+import ReactDOM from 'react-dom/server';
+import { ServerStyleSheet, StyleSheetManager } from 'styled-components';
+import cookiesMiddleware from 'universal-cookie-express';
 
-import { handleNodeProcessEvents, unregisterNodeProcessEvents } from './nodeProcessEvents';
+import api from './api';
+import chunks from './chunk-manifest.json'; // eslint-disable-line import/no-unresolved
 import App from './components/App';
-import Html from './components/Html';
 import ErrorPage from './components/ErrorPage';
+import Html from './components/Html';
+import AppContext from './contexts/AppContext';
 import createFetch from './createFetch';
+import alertListener from './events/AlertListener';
+import dataListener from './events/DataListener';
+import * as mongo from './mongo';
+import { handleNodeProcessEvents, unregisterNodeProcessEvents } from './nodeProcessEvents';
 import router from './router';
 // import assets from './asset-manifest.json'; // eslint-disable-line import/no-unresolved
 // $FlowFixMe
-import chunks from './chunk-manifest.json'; // eslint-disable-line import/no-unresolved
-import AppContext from './contexts/AppContext';
-import api from './api';
-import * as mongo from './mongo';
 import { createScraperCron } from './scraper/cron';
 import Emitter from './scraper/emitter';
-import dataListener from './events/DataListener';
-import alertListener from './events/AlertListener';
 
 export type ServerContext = {
   db: Db,
@@ -135,9 +135,9 @@ const createApp = async (): Promise<AppInfo> => {
       data.styleTags = sheet.getStyleElement();
 
       const scripts = new Set();
-      const addChunk = chunk => {
+      const addChunk = (chunk) => {
         if (chunks[chunk]) {
-          chunks[chunk].forEach(asset => scripts.add(asset));
+          chunks[chunk].forEach((asset) => scripts.add(asset));
           // $FlowFixMe
         } else if (__DEV__) {
           throw new Error(`Chunk with name '${chunk}' cannot be found`);
@@ -204,7 +204,7 @@ const createApp = async (): Promise<AppInfo> => {
     });
 
     // Handle kill signal (something isn't playing nicely)
-    ['SIGINT', 'SIGTERM'].forEach(sig => process.on(sig, () => process.exit(0)));
+    ['SIGINT', 'SIGTERM'].forEach((sig) => process.on(sig, () => process.exit(0)));
   }
 
   //
@@ -237,7 +237,7 @@ const createApp = async (): Promise<AppInfo> => {
 // $FlowFixMe
 if (!module.hot) {
   // entry point
-  createApp().catch(err => console.error('Failed to create app', err));
+  createApp().catch((err) => console.error('Failed to create app', err));
 }
 
 export default createApp;

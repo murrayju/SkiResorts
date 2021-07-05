@@ -1,4 +1,5 @@
 import React from 'react';
+
 import NotFound from '../components/NotFound';
 
 const title = 'Page Not Found';

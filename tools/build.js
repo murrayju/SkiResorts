@@ -1,10 +1,10 @@
-import run from './run';
+import bundle from './bundle';
 import clean from './clean';
 import copy from './copy';
-import bundle from './bundle';
-import lint from './lint';
-import yarn from './yarn';
 import generateSrc from './generateSrc';
+import lint from './lint';
+import run from './run';
+import yarn from './yarn';
 
 /**
  * Compiles the project from source files into a distributable

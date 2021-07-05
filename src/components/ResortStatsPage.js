@@ -1,8 +1,9 @@
 // @flow
-import React, { useContext, useState, useEffect } from 'react';
 import { flow, map, sortBy } from 'lodash/fp';
+import React, { useContext, useEffect, useState } from 'react';
 
 import AppContext from '../contexts/AppContext';
+
 import { Container } from './flex';
 import Loading from './Loading';
 import ResortStatsCard from './ResortStatsCard';
@@ -21,7 +22,7 @@ const ResortStatsPage = ({ stat, title, graphHeight }: Props) => {
     fetch(`/api/stats/${stat}`, {
       method: 'GET',
     })
-      .then(r => r.json())
+      .then((r) => r.json())
       .then(setData);
   }, [stat, fetch]);
 
@@ -31,7 +32,7 @@ const ResortStatsPage = ({ stat, title, graphHeight }: Props) => {
       {data ? (
         flow(
           sortBy(['_id']),
-          map(resort => (
+          map((resort) => (
             <ResortStatsCard resort={resort} graphHeight={graphHeight} key={resort._id} />
           )),
         )(data)

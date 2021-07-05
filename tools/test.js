@@ -1,7 +1,8 @@
-import path from 'path';
+import { buildLog, dockerComposeTeardown, onKillSignal, run, spawn } from 'build-strap';
 import fs from 'fs-extra';
 import getPort from 'get-port';
-import { buildLog, run, spawn, onKillSignal, dockerComposeTeardown } from 'build-strap';
+import path from 'path';
+
 import build from './build';
 
 // Run tests in Mocha

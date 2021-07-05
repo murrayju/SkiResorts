@@ -1,9 +1,9 @@
 // @flow
-import cheerio from 'cheerio';
-import fetch from 'node-fetch';
-import { mapValues } from 'lodash/fp';
-import { merge } from 'lodash';
 import { Promise as Bluebird } from 'bluebird';
+import cheerio from 'cheerio';
+import { merge } from 'lodash';
+import { mapValues } from 'lodash/fp';
+import fetch from 'node-fetch';
 
 export type PageScraper = {|
   url: string,
@@ -45,15 +45,15 @@ export const getPageData = async ({
   weatherSelectors,
   customFn,
 }: PageScraper): Promise<ScraperResult> => {
-  const rawResponse = await fetch(url).then(r => r.text());
+  const rawResponse = await fetch(url).then((r) => r.text());
   const $ = await cheerio.load(rawResponse);
 
   const scrapedData = {
     url,
     timestamp: new Date(),
     rawResponse,
-    status: mapValues(s => s($))(statusSelectors),
-    weather: mapValues(s => s($))(weatherSelectors),
+    status: mapValues((s) => s($))(statusSelectors),
+    weather: mapValues((s) => s($))(weatherSelectors),
   };
 
   const customData = (customFn && (await customFn($, url))) || {};

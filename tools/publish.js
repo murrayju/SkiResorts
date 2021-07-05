@@ -1,4 +1,5 @@
-import { run, clean, publish, getVersion, buildLog, yarn } from 'build-strap';
+import { buildLog, clean, getVersion, publish, run, yarn } from 'build-strap';
+
 import build from './build';
 // import test from './test';
 
@@ -29,8 +30,10 @@ export default async function doPublish() {
     // await run(test, true);
     if (process.argv.includes('--publish-node-modules')) {
       buildLog('Fetching node_modules needed for production...');
-      await yarn([], {
-        cwd: './build/',
+      await yarn({
+        spawnOptions: {
+          cwd: './build/',
+        },
       });
     }
   }

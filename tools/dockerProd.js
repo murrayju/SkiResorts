@@ -1,16 +1,17 @@
 // @flow
-import fs from 'fs-extra';
-import getPort from 'get-port';
 import {
   buildLog,
-  getDockerRepo,
-  dockerImages,
   dockerContainerRun,
+  dockerImages,
   dockerNetworkDelete,
   dockerTryStopContainer,
-  run,
+  getDockerRepo,
   onKillSignal,
+  run,
 } from 'build-strap';
+import fs from 'fs-extra';
+import getPort from 'get-port';
+
 import docker, { getBuildImage, getBuildTag, runDbContainer } from './docker';
 
 // Run the production docker image
@@ -20,7 +21,7 @@ export default async function dockerProd(
 ) {
   await fs.ensureFile('./latest.build.tag');
   const tag = await getBuildTag();
-  if (build || !(await dockerImages(getDockerRepo())).find(m => m.tag === tag)) {
+  if (build || !(await dockerImages(getDockerRepo())).find((m) => m.tag === tag)) {
     buildLog('Image does not exist, running docker build...');
     await run(docker);
   }

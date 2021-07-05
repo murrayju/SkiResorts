@@ -1,7 +1,7 @@
-import { buildLog, getPkg, getVersion, writeFile, copyDir, copyFile, cleanDir } from 'build-strap';
+import { buildLog, cleanDir, copyDir, copyFile, getPkg, getVersion, writeFile } from 'build-strap';
 import chokidar from 'chokidar';
-import path from 'path';
 import fs from 'fs-extra';
+import path from 'path';
 
 /**
  * Copies everything to the build folder that we want to publish

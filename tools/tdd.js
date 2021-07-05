@@ -1,26 +1,26 @@
 import config from '@murrayju/config';
-import path from 'path';
-import express from 'express';
 import browserSync from 'browser-sync';
+import {
+  buildLog,
+  dockerComposeTeardown,
+  dockerNetworkCreate,
+  format,
+  onKillSignal,
+} from 'build-strap';
+import chokidar from 'chokidar';
+import express from 'express';
+import fs from 'fs-extra';
+import path from 'path';
+import errorOverlayMiddleware from 'react-dev-utils/errorOverlayMiddleware';
 import webpack from 'webpack';
 import webpackDevMiddleware from 'webpack-dev-middleware';
 import webpackHotMiddleware from 'webpack-hot-middleware';
-import errorOverlayMiddleware from 'react-dev-utils/errorOverlayMiddleware';
-import {
-  format,
-  onKillSignal,
-  buildLog,
-  dockerNetworkCreate,
-  dockerComposeTeardown,
-} from 'build-strap';
-import fs from 'fs-extra';
-import chokidar from 'chokidar';
 
-import webpackConfig from './webpack.config';
-import run from './run';
 import clean from './clean';
-import lint from './lint';
 import { runDbContainer } from './docker';
+import lint from './lint';
+import run from './run';
+import webpackConfig from './webpack.config';
 
 const isDebug = !process.argv.includes('--release');
 
@@ -42,7 +42,7 @@ function createCompilationPromise(name, compiler, cfg) {
       console.info(`[${format(timeStart)}] Compiling '${name}'...`);
     });
 
-    compiler.hooks.done.tap(name, stats => {
+    compiler.hooks.done.tap(name, (stats) => {
       console.info(stats.toString(cfg.stats));
       const timeEnd = new Date();
       const time = timeEnd.getTime() - timeStart.getTime();
@@ -71,7 +71,7 @@ async function start(
 
   // Doesn't resolve until kill signal sent
   // eslint-disable-next-line no-async-promise-executor
-  return new Promise(async outerResolve => {
+  return new Promise(async (outerResolve) => {
     const network = 'ski-resorts-tdd';
 
     let cleaning = null;
@@ -107,7 +107,7 @@ async function start(
       server.use(express.static(path.resolve(__dirname, '../public')));
 
       // Configure client-side hot module replacement
-      const clientConfig = webpackConfig.find(cfg => cfg.name === 'client');
+      const clientConfig = webpackConfig.find((cfg) => cfg.name === 'client');
       clientConfig.entry.client = ['./tools/lib/webpackHotDevClient']
         .concat(clientConfig.entry.client)
         .sort((a, b) => b.includes('polyfill') - a.includes('polyfill'));
@@ -116,21 +116,25 @@ async function start(
         'chunkhash',
         'hash',
       );
-      clientConfig.module.rules = clientConfig.module.rules.filter(x => x.loader !== 'null-loader');
+      clientConfig.module.rules = clientConfig.module.rules.filter(
+        (x) => x.loader !== 'null-loader',
+      );
       clientConfig.plugins.push(new webpack.HotModuleReplacementPlugin());
 
       // Configure server-side hot module replacement
-      const serverConfig = webpackConfig.find(cfg => cfg.name === 'server');
+      const serverConfig = webpackConfig.find((cfg) => cfg.name === 'server');
       serverConfig.output.hotUpdateMainFilename = 'updates/[hash].hot-update.json';
       serverConfig.output.hotUpdateChunkFilename = 'updates/[id].[hash].hot-update.js';
-      serverConfig.module.rules = serverConfig.module.rules.filter(x => x.loader !== 'null-loader');
+      serverConfig.module.rules = serverConfig.module.rules.filter(
+        (x) => x.loader !== 'null-loader',
+      );
       serverConfig.plugins.push(new webpack.HotModuleReplacementPlugin());
 
       // Configure compilation
       await run(clean, false);
       const multiCompiler = webpack(webpackConfig);
-      const clientCompiler = multiCompiler.compilers.find(compiler => compiler.name === 'client');
-      const serverCompiler = multiCompiler.compilers.find(compiler => compiler.name === 'server');
+      const clientCompiler = multiCompiler.compilers.find((compiler) => compiler.name === 'client');
+      const serverCompiler = multiCompiler.compilers.find((compiler) => compiler.name === 'server');
       const clientPromise = createCompilationPromise('client', clientCompiler, clientConfig);
       const serverPromise = createCompilationPromise('server', serverCompiler, serverConfig);
 
@@ -153,13 +157,13 @@ async function start(
         if (!appPromiseIsResolved) return;
         appPromiseIsResolved = false;
         // eslint-disable-next-line no-return-assign
-        appPromise = new Promise(resolve => (appPromiseResolve = resolve));
+        appPromise = new Promise((resolve) => (appPromiseResolve = resolve));
       });
 
       let app = null;
       let destroy = null;
       server.use((req, res) => {
-        appPromise.then(() => app.handle(req, res)).catch(error => console.error(error));
+        appPromise.then(() => app.handle(req, res)).catch((error) => console.error(error));
       });
 
       const recreateApp = async () => {
@@ -183,7 +187,7 @@ async function start(
         }
         return app.hot
           .check(true)
-          .then(updatedModules => {
+          .then((updatedModules) => {
             if (!updatedModules) {
               if (fromUpdate) {
                 console.info(`${hmrPrefix}Update applied.`);
@@ -194,11 +198,11 @@ async function start(
               console.info(`${hmrPrefix}Nothing hot updated.`);
             } else {
               console.info(`${hmrPrefix}Updated modules:`);
-              updatedModules.forEach(moduleId => console.info(`${hmrPrefix} - ${moduleId}`));
+              updatedModules.forEach((moduleId) => console.info(`${hmrPrefix} - ${moduleId}`));
               checkForUpdate(true);
             }
           })
-          .catch(async error => {
+          .catch(async (error) => {
             if (['abort', 'fail'].includes(app.hot.status())) {
               console.warn(`${hmrPrefix}Cannot apply update.`);
               await recreateApp();

@@ -1,13 +1,13 @@
 // @flow
+import { position } from 'polished';
 import React, { useState } from 'react';
 import type { Node as ReactNode } from 'react';
 import styled, { ThemeProvider } from 'styled-components';
-import { position } from 'polished';
 
 // external-global styles must be imported in your JS.
 import Header from './Header';
-import Sidebar from './Sidebar';
 import MainContainer from './MainContainer';
+import Sidebar from './Sidebar';
 
 // used by styled-components
 // this should match the values in aura
@@ -66,7 +66,7 @@ const Layout = ({ container, children, ...props }: Props) => {
   return (
     <ThemeProvider theme={bsTheme}>
       <>
-        <Header menuActive={menuOpen} onMenuClick={() => setMenuOpen(o => !o)} />
+        <Header menuActive={menuOpen} onMenuClick={() => setMenuOpen((o) => !o)} />
         <ContentRoot>
           {menuOpen ? <Sidebar /> : null}
           {container ? <MainContainer {...props}>{children}</MainContainer> : children}

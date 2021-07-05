@@ -1,4 +1,4 @@
-import { makeDir, spawn, buildLog } from 'build-strap';
+import { buildLog, makeDir, spawn } from 'build-strap';
 
 // Transpile js using babel
 export default async function babel() {

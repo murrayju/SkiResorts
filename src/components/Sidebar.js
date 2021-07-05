@@ -3,9 +3,10 @@ import React, { useContext } from 'react';
 import { Nav, NavItem } from 'react-bootstrap';
 import styled from 'styled-components';
 
+import AppContext from '../contexts/AppContext';
+
 import Icon from './Icon';
 import { withLink } from './Link';
-import AppContext from '../contexts/AppContext';
 
 const NavItemLinkStyled = styled(withLink()(NavItem))`
   font-size: 16px;

@@ -1,12 +1,14 @@
 module.exports = {
-  parser: 'babel-eslint',
+  parser: '@babel/eslint-parser',
 
-  plugins: ['flowtype', 'css-modules', 'prettier', 'react-hooks'],
+  plugins: ['@babel', 'flowtype', 'css-modules', 'prettier', 'react', 'react-hooks'],
   extends: [
     'airbnb',
     'plugin:flowtype/recommended',
     'plugin:css-modules/recommended',
     'plugin:prettier/recommended',
+    'plugin:react/recommended',
+    'plugin:react-hooks/recommended',
   ],
 
   parserOptions: {
@@ -41,6 +43,15 @@ module.exports = {
     // https://github.com/benmosher/eslint-plugin-import/blob/master/docs/rules/no-extraneous-dependencies.md
     'import/no-extraneous-dependencies': ['error', { packageDir: '.' }],
     'import/no-cycle': 'off',
+    'import/no-named-as-default': 'off',
+    'import/order': [
+      'error',
+      {
+        alphabetize: { order: 'asc', caseInsensitive: true },
+        'newlines-between': 'always',
+        groups: [['builtin', 'external'], 'parent', 'sibling', 'index', 'object'],
+      },
+    ],
     'import/prefer-default-export': 'off',
     // Recommend not to leave any console.log in your code
     // Use console.error, console.warn and console.info instead
@@ -52,7 +63,6 @@ module.exports = {
       },
     ],
     'no-debugger': 'warn',
-    'no-nested-ternary': 'off',
 
     // Prefer destructuring from arrays and objects
     // http://eslint.org/docs/rules/prefer-destructuring
@@ -84,6 +94,7 @@ module.exports = {
       },
     ],
 
+    'react/display-name': 'off',
     // Allow .js files to use JSX syntax
     // https://github.com/yannickcr/eslint-plugin-react/blob/master/docs/rules/jsx-filename-extension.md
     'react/jsx-filename-extension': ['error', { extensions: ['.js', '.jsx'] }],
@@ -91,13 +102,15 @@ module.exports = {
     // Functional and class components are equivalent from React’s point of view
     // https://github.com/yannickcr/eslint-plugin-react/blob/master/docs/rules/prefer-stateless-function.md
     'react/prefer-stateless-function': 'off',
-    'react/forbid-prop-types': 'off',
+    'react/forbid-prop-types': 'error',
+    'react/require-default-props': 'off',
     'react/static-property-placement': ['error', 'static public field'],
     'react/jsx-props-no-spreading': 'off',
     'react/jsx-one-expression-per-line': 'off',
     'react/destructuring-assignment': ['warn', 'always', { ignoreClassFields: true }],
     'react-hooks/rules-of-hooks': 'error',
     'react-hooks/exhaustive-deps': 'warn',
+    'sort-imports': ['error', { ignoreDeclarationSort: true, ignoreCase: true }],
   },
 
   settings: {

@@ -3,11 +3,11 @@ module.exports = {
     [
       '@babel/preset-env',
       {
-        targets: {
-          node: 'current',
-        },
+        useBuiltIns: 'usage',
+        corejs: { version: '3.15', proposals: true },
       },
     ],
+    '@babel/preset-react',
     '@babel/preset-flow',
   ],
   sourceMaps: 'inline',

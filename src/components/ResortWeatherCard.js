@@ -1,12 +1,12 @@
 // @flow
-import React, { useState, useEffect } from 'react';
-import randomColor from 'randomcolor';
-import { flow, map, filter } from 'lodash/fp';
+import { filter, flow, map } from 'lodash/fp';
 import moment from 'moment';
+import randomColor from 'randomcolor';
+import React, { useEffect, useState } from 'react';
 
-import Paper from './Paper';
-import LineGraph from './LineGraph';
 import { FormGroupFlowBox } from './flex';
+import LineGraph from './LineGraph';
+import Paper from './Paper';
 
 type WeatherData = {
   lastUpdated: string,
@@ -137,7 +137,7 @@ const ResortWeatherCard = ({ resort, graphHeight }: Props) => {
     <Paper>
       <h2>{resort._id}</h2>
       <FormGroupFlowBox>
-        {Object.keys(timeChoices).map(k => (
+        {Object.keys(timeChoices).map((k) => (
           <label key={k} htmlFor={k} css="padding-left: 10px;">
             <input
               css="&& { margin-right: 5px; }"
@@ -153,20 +153,20 @@ const ResortWeatherCard = ({ resort, graphHeight }: Props) => {
           </label>
         ))}
       </FormGroupFlowBox>
-      {graphs.map(graph => (
+      {graphs.map((graph) => (
         <LineGraph
           key={graph.name}
           height={graphHeight}
           data={{
             datasets: graph.data
-              .filter(({ src, prop }) => src?.some(d => d[prop] != null))
+              .filter(({ src, prop }) => src?.some((d) => d[prop] != null))
               .map(({ label, src, prop, axis, ownAxis }, i) => ({
                 label,
                 borderColor: colors[i],
                 yAxisID: axis || (ownAxis ? prop : 'default'),
                 data: flow(
-                  filter(t => t[prop] != null && moment(t.lastUpdated).isAfter(timeLimit)),
-                  map(t => ({
+                  filter((t) => t[prop] != null && moment(t.lastUpdated).isAfter(timeLimit)),
+                  map((t) => ({
                     x: moment(t.lastUpdated),
                     y: t[prop],
                   })),

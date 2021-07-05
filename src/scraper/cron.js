@@ -1,14 +1,15 @@
 // @flow
 import config from '@murrayju/config';
 import { CronJob } from 'cron';
-import { merge, isEqual } from 'lodash';
+import { isEqual, merge } from 'lodash';
 import moment from 'moment';
 
-import { getResortsData } from './scraper';
-import resorts from './resorts';
 import logger from '../logger';
-import { entries } from '../util/maps';
 import type { ServerContext } from '../server';
+import { entries } from '../util/maps';
+
+import resorts from './resorts';
+import { getResortsData } from './scraper';
 
 export const createScraperCron = ({ db, emitter }: ServerContext): CronJob => {
   const recordData = async () => {
@@ -33,7 +34,7 @@ export const createScraperCron = ({ db, emitter }: ServerContext): CronJob => {
               const [type, status] = comboName.split('_');
               // $FlowFixMe
               await Promise.allSettled(
-                values.map(async name => {
+                values.map(async (name) => {
                   const newData = {
                     resort,
                     name,

@@ -1,18 +1,20 @@
 // @flow
-import Router from 'express-promise-router';
-import cors from 'cors';
-import cookieParser from 'cookie-parser';
-import uuid from 'uuid/v4';
 import config from '@murrayju/config';
+import cookieParser from 'cookie-parser';
+import cors from 'cors';
+import Router from 'express-promise-router';
+import { v4 as uuid } from 'uuid';
 
-import { getResortsData, getResortData } from '../scraper/scraper';
+import logger from '../logger';
 import resorts from '../scraper/resorts';
+import { getResortData, getResortsData } from '../scraper/scraper';
+import type { ServerContext } from '../server';
+import { version } from '../version._generated_'; // eslint-disable-line import/no-unresolved
+
 import aggregator from './aggregator';
 import weatherAggregator from './weatherAggregator';
+
 // $FlowFixMe - generated file
-import { version } from '../version._generated_'; // eslint-disable-line import/no-unresolved
-import logger from '../logger';
-import type { ServerContext } from '../server';
 
 export type ApiRequestContext = {
   correlationId: string,
@@ -28,7 +30,7 @@ export type ApiRequest = {
 };
 
 // Middleware factory
-export default function(serverContext: ServerContext) {
+export default function (serverContext: ServerContext) {
   const router = Router();
 
   router.use(cors());

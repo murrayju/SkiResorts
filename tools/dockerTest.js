@@ -1,7 +1,8 @@
 // @flow
+import { buildLog, dockerComposeTeardown, dockerContainerRun } from 'build-strap';
 import path from 'path';
-import { buildLog, dockerContainerRun, dockerComposeTeardown } from 'build-strap';
-import { getBuilderImage, ensureBuilder } from './docker';
+
+import { ensureBuilder, getBuilderImage } from './docker';
 
 // Run automated tests within the docker container
 export default async function dockerTest(

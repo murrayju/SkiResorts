@@ -1,9 +1,9 @@
-import styled, { css } from 'styled-components';
 import { darken, readableColor, transparentize } from 'polished';
+import styled, { css } from 'styled-components';
 
 const brandColors = ['default', 'primary', 'primaryDark', 'success', 'info', 'warning', 'danger'];
 
-export const propsColor = props =>
+export const propsColor = (props) =>
   props.color
     ? brandColors.includes(props.color)
       ? props.theme.brand[props.color]
@@ -13,7 +13,7 @@ export const propsColor = props =>
 
 const IconButton = styled.button`
   flex: 0 0 auto;
-  color: ${props =>
+  color: ${(props) =>
     props.textColor || transparentize(0.2, readableColor(propsColor(props) || '#fff'))};
   padding: 0.5em;
   overflow: visible;
@@ -23,7 +23,7 @@ const IconButton = styled.button`
   transition: background-color 150ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
   border-radius: ${({ radius, text }) =>
     typeof radius === 'number' ? `${radius}px` : radius || (text ? '10px' : '50%')};
-  background-color: ${props => propsColor(props) || 'transparent'};
+  background-color: ${(props) => propsColor(props) || 'transparent'};
 
   ${({ raised }) =>
     raised
@@ -35,8 +35,8 @@ const IconButton = styled.button`
       : ''}
 
   &:hover {
-    background-color: ${props => darken(0.1, propsColor(props) || 'rgba(0, 0, 0, 0.08)')};
-    color: ${props =>
+    background-color: ${(props) => darken(0.1, propsColor(props) || 'rgba(0, 0, 0, 0.08)')};
+    color: ${(props) =>
       props.textColor ||
       transparentize(0.3, readableColor(darken(0.1, propsColor(props) || '#fff')))};
     box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.2), 0 4px 5px 0 rgba(0, 0, 0, 0.14),
@@ -45,7 +45,7 @@ const IconButton = styled.button`
 
   &[disabled] {
     color: rgba(0, 0, 0, 0.26);
-    background-color: ${props => (propsColor(props) ? 'rgba(0, 0, 0, 0.03)' : 'transparent')};
+    background-color: ${(props) => (propsColor(props) ? 'rgba(0, 0, 0, 0.03)' : 'transparent')};
     box-shadow: 0 0 0 0 rgba(0, 0, 0, 0.2), 0 0 0 0 rgba(0, 0, 0, 0.14), 0 0 0 0 rgba(0, 0, 0, 0.12);
     cursor: default;
     pointer-events: none;

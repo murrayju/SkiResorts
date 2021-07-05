@@ -1,9 +1,9 @@
 // @flow
 /* eslint-disable react/no-danger, jsx-a11y/control-has-associated-label */
+import fontAwesome from '@fortawesome/fontawesome-free/css/all.css';
 import * as React from 'react';
 import serialize from 'serialize-javascript';
 
-import fontAwesome from '@fortawesome/fontawesome-free/css/all.css';
 // $FlowFixMe
 import bs from '../bs-theme.less'; // eslint-disable-line
 
@@ -30,7 +30,7 @@ const Html = ({ title, description, scripts, app, children, styleTags }: Props) 
       <meta name="description" content={description} />
       <meta name="viewport" content="width=device-width, initial-scale=1" />
       {scripts &&
-        scripts.map(script => <link key={script} rel="preload" href={script} as="script" />)}
+        scripts.map((script) => <link key={script} rel="preload" href={script} as="script" />)}
       <link rel="manifest" href="/site.webmanifest" />
       <link rel="apple-touch-icon" href="/icon.png" />
       <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500" />
@@ -46,7 +46,7 @@ const Html = ({ title, description, scripts, app, children, styleTags }: Props) 
     <body>
       <div id="app" dangerouslySetInnerHTML={{ __html: children }} />
       {app ? <script dangerouslySetInnerHTML={{ __html: `window.App=${serialize(app)}` }} /> : null}
-      {scripts && scripts.map(script => <script key={script} src={script} />)}
+      {scripts && scripts.map((script) => <script key={script} src={script} />)}
     </body>
   </html>
 );

@@ -2,11 +2,13 @@ import fs from 'fs';
 import path from 'path';
 import webpack from 'webpack';
 import WebpackAssetsManifest from 'webpack-assets-manifest';
-import nodeExternals from 'webpack-node-externals';
 import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer';
-import overrideRules from './lib/overrideRules';
-import pkg from '../package.json';
+import nodeExternals from 'webpack-node-externals';
+
 import babelCfg from '../babel.config';
+import pkg from '../package.json';
+
+import overrideRules from './lib/overrideRules';
 
 const ROOT_DIR = path.resolve(__dirname, '..');
 const resolvePath = (...args) => path.resolve(ROOT_DIR, ...args);
@@ -41,7 +43,7 @@ const config = {
     filename: isDebug ? '[name].js' : '[name].[chunkhash:8].js',
     chunkFilename: isDebug ? '[name].chunk.js' : '[name].[chunkhash:8].chunk.js',
     // Point sourcemap entries to original disk location (format as URL on Windows)
-    devtoolModuleFilenameTemplate: info =>
+    devtoolModuleFilenameTemplate: (info) =>
       path.resolve(info.absoluteResourcePath).replace(/\\/g, '/'),
   },
 
@@ -101,9 +103,6 @@ const config = {
                   // Replaces the React.createElement function with one that is more optimized for production
                   // https://github.com/babel/babel/tree/master/packages/babel-plugin-transform-react-inline-elements
                   '@babel/transform-react-inline-elements',
-                  // Remove unnecessary React propTypes from the production build
-                  // https://github.com/oliviertassinari/babel-plugin-transform-react-remove-prop-types
-                  'transform-react-remove-prop-types',
                 ]),
           ],
         },
@@ -291,7 +290,7 @@ const clientConfig = {
   target: 'web',
 
   entry: {
-    client: ['@babel/polyfill', './src/client.js'],
+    client: ['./src/client.js'],
   },
 
   plugins: [
@@ -317,8 +316,8 @@ const clientConfig = {
         // Write chunk-manifest.json.json
         const chunkFileName = `${BUILD_DIR}/chunk-manifest.json`;
         try {
-          const fileFilter = file => !file.endsWith('.map');
-          const addPath = file => manifest.getPublicPath(file);
+          const fileFilter = (file) => !file.endsWith('.map');
+          const addPath = (file) => manifest.getPublicPath(file);
           const chunkFiles = stats.compilation.chunkGroups.reduce((acc, c) => {
             acc[c.name] = [
               ...(acc[c.name] || []),
@@ -381,7 +380,7 @@ const serverConfig = {
   target: 'node',
 
   entry: {
-    server: ['@babel/polyfill', './src/server.js'],
+    server: ['./src/server.js'],
   },
 
   output: {
@@ -401,14 +400,14 @@ const serverConfig = {
   module: {
     ...config.module,
 
-    rules: overrideRules(config.module.rules, rule => {
+    rules: overrideRules(config.module.rules, (rule) => {
       // Override babel-preset-env configuration for Node.js
       if (rule.loader === 'babel-loader') {
         return {
           ...rule,
           options: {
             ...rule.options,
-            presets: rule.options.presets.map(preset =>
+            presets: rule.options.presets.map((preset) =>
               preset[0] !== '@babel/preset-env'
                 ? preset
                 : [

@@ -1,6 +1,6 @@
 // @flow
-import { describe, it } from 'mocha';
 import { expect } from 'chai';
+import { describe, it } from 'mocha';
 
 describe('scraper', () => {
   it('runs tests', () => {

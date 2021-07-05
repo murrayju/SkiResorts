@@ -76,19 +76,21 @@ const alta: ResortScraper = [
       return {
         rawData,
         status: {
-          lifts_open: lifts.filter(l => l.open).map(l => l.name),
-          lifts_closed: lifts.filter(l => !l.open).map(l => l.name),
-          runs_open: lifts.flatMap(l => l.runs.filter(r => r.open).map(r => r.name)),
-          runs_closed: lifts.flatMap(l => l.runs.filter(r => !r.open).map(r => r.name)),
+          lifts_open: lifts.filter((l) => l.open).map((l) => l.name),
+          lifts_closed: lifts.filter((l) => !l.open).map((l) => l.name),
+          runs_open: lifts.flatMap((l) => l.runs.filter((r) => r.open).map((r) => r.name)),
+          runs_closed: lifts.flatMap((l) => l.runs.filter((r) => !r.open).map((r) => r.name)),
           areas_open: [
-            ...areas.filter(a => a.status === 'open').map(a => a.name),
-            ...gates.filter(g => g.open).map(g => g.name),
+            ...areas.filter((a) => a.status === 'open').map((a) => a.name),
+            ...gates.filter((g) => g.open).map((g) => g.name),
           ],
           areas_closed: [
-            ...areas.filter(a => a.status === 'closed').map(a => a.name),
-            ...gates.filter(g => !g.open).map(g => g.name),
+            ...areas.filter((a) => a.status === 'closed').map((a) => a.name),
+            ...gates.filter((g) => !g.open).map((g) => g.name),
           ],
-          areas_pending: areas.filter(a => !['open', 'closed'].includes(a.status)).map(a => a.name),
+          areas_pending: areas
+            .filter((a) => !['open', 'closed'].includes(a.status))
+            .map((a) => a.name),
         },
       };
     },

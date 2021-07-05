@@ -1,6 +1,7 @@
 // @flow
 import { isNaN } from 'lodash';
 import moment from 'moment-timezone';
+
 import type { ResortScraper } from '../scraper';
 
 const maybeFloat = (str: mixed): ?number => {
@@ -9,27 +10,16 @@ const maybeFloat = (str: mixed): ?number => {
 };
 
 const windRegex = /\s*([^@]+)@(\d+)(?:-(\d+))?/i;
-const findCondition = (regex: RegExp) => $ =>
+const findCondition = (regex: RegExp) => ($) =>
   $('.conditions-data .conditions > div')
-    .filter((i, item) =>
-      regex.test(
-        $(item)
-          .children('.sb-condition_label')
-          .text(),
-      ),
-    )
-    .map((i, item) =>
-      $(item)
-        .find('.sb-condition_value')
-        .text()
-        .trim(),
-    )
+    .filter((i, item) => regex.test($(item).children('.sb-condition_label').text()))
+    .map((i, item) => $(item).find('.sb-condition_value').text().trim())
     .get()[0];
 
-const findConditionNum = (regex: RegExp) => $ => maybeFloat(findCondition(regex)($));
+const findConditionNum = (regex: RegExp) => ($) => maybeFloat(findCondition(regex)($));
 
 const tz = 'America/Denver';
-const getUpdatedTime = $ =>
+const getUpdatedTime = ($) =>
   moment
     .tz(
       `${moment.tz(tz).format('YYYY-MM-DD')} ${$('.conditions-header .date-display span')
@@ -44,15 +34,15 @@ const snowbird: ResortScraper = [
   {
     url: 'https://www.snowbird.com/mountain-report/',
     statusSelectors: {
-      areas_open: $ =>
+      areas_open: ($) =>
         $('.snow-report-gates .listings .open .title')
           .map((i, item) => $(item).text())
           .get(),
-      areas_closed: $ =>
+      areas_closed: ($) =>
         $('.snow-report-gates .listings .closed .title')
           .map((i, item) => $(item).text())
           .get(),
-      areas_pending: $ =>
+      areas_pending: ($) =>
         $('.snow-report-gates .listings .pending .title')
           .map((i, item) => $(item).text())
           .get(),
@@ -70,48 +60,48 @@ const snowbird: ResortScraper = [
       mid_tempF: findConditionNum(/mid-mtn temp/i),
       top_lastUpdated: getUpdatedTime,
       top_tempF: findConditionNum(/peak temp/i),
-      top_windSpeedMph: $ => {
+      top_windSpeedMph: ($) => {
         const [, , min, max] = findCondition(/wind speed/i)($).match(windRegex) || [];
         const result = min && max ? (parseFloat(min) + parseFloat(max)) / 2 : parseFloat(min);
         return isNaN(result) ? null : result;
       },
-      top_windGustMph: $ => {
+      top_windGustMph: ($) => {
         const [, , , max] = findCondition(/wind speed/i)($).match(windRegex) || [];
         return maybeFloat(max);
       },
-      top_windDirection: $ => findCondition(/wind speed/i)($).match(windRegex)?.[1],
+      top_windDirection: ($) => findCondition(/wind speed/i)($).match(windRegex)?.[1],
     },
   },
   {
     url: 'https://www.snowbird.com/lifts-trails/',
     statusSelectors: {
-      lifts_open: $ =>
+      lifts_open: ($) =>
         $('.snow-report-lifts .listings .open .title')
           .map((i, item) => $(item).text())
           .get(),
-      lifts_closed: $ =>
+      lifts_closed: ($) =>
         $('.snow-report-lifts .listings .closed .title')
           .map((i, item) => $(item).text())
           .get(),
-      lifts_pending: $ =>
+      lifts_pending: ($) =>
         $('.snow-report-lifts .listings .pending .title')
           .map((i, item) => $(item).text())
           .get(),
-      runs_open: $ =>
+      runs_open: ($) =>
         $('.snow-report-trails .listings .open .title')
           .map((i, item) => $(item).text())
           .get()
-          .filter(item => item !== 'Alpine Trail'),
-      runs_closed: $ =>
+          .filter((item) => item !== 'Alpine Trail'),
+      runs_closed: ($) =>
         $('.snow-report-trails .listings .closed .title')
           .map((i, item) => $(item).text())
           .get()
-          .filter(item => item !== 'Alpine Trail'),
-      runs_pending: $ =>
+          .filter((item) => item !== 'Alpine Trail'),
+      runs_pending: ($) =>
         $('.snow-report-trails .listings .pending .title')
           .map((i, item) => $(item).text())
           .get()
-          .filter(item => item !== 'Alpine Trail'),
+          .filter((item) => item !== 'Alpine Trail'),
     },
   },
 ];

@@ -7,18 +7,18 @@
  * LICENSE.txt file in the root directory of this source tree.
  */
 
-import hotClient from 'webpack-hot-middleware/client';
-import launchEditorEndpoint from 'react-dev-utils/launchEditorEndpoint';
 import formatWebpackMessages from 'react-dev-utils/formatWebpackMessages';
+import launchEditorEndpoint from 'react-dev-utils/launchEditorEndpoint';
 import {
-  setEditorHandler,
-  reportBuildError,
   dismissBuildError,
+  reportBuildError,
+  setEditorHandler,
   startReportingRuntimeErrors,
   stopReportingRuntimeErrors,
 } from 'react-error-overlay';
+import hotClient from 'webpack-hot-middleware/client';
 
-setEditorHandler(errorLocation => {
+setEditorHandler((errorLocation) => {
   const fileName = encodeURIComponent(errorLocation.fileName);
   const lineNumber = encodeURIComponent(errorLocation.lineNumber || 1);
   fetch(

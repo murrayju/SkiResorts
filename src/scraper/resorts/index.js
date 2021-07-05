@@ -1,5 +1,6 @@
 // @flow
 import type { ScraperMap } from '../scraper';
+
 import alta from './alta';
 import snowbird from './snowbird';
 

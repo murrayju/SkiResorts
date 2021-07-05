@@ -1,11 +1,11 @@
 // @flow
-import React, { useState, useEffect } from 'react';
-import randomColor from 'randomcolor';
-import { flow, map, filter, orderBy, sortBy } from 'lodash/fp';
+import { filter, flow, map, orderBy, sortBy } from 'lodash/fp';
 import moment from 'moment';
+import randomColor from 'randomcolor';
+import React, { useEffect, useState } from 'react';
 
-import Paper from './Paper';
 import LineGraph from './LineGraph';
+import Paper from './Paper';
 
 type ResortStatus = 'open' | 'closed' | 'pending';
 
@@ -69,15 +69,15 @@ const ResortStatsCard = ({ resort, graphHeight }: Props) => {
     })),
   )(resort.data);
   const closed = flow(
-    filter(a => a.status === 'closed'),
+    filter((a) => a.status === 'closed'),
     orderBy(['lastOpen', 'lastPending', 'lastClosed'], ['asc', 'desc', 'desc']),
   )(resortData);
   const pending = flow(
-    filter(a => a.status === 'pending'),
+    filter((a) => a.status === 'pending'),
     orderBy(['lastOpen', 'lastClosed'], ['asc', 'desc']),
   )(resortData);
   const open = flow(
-    filter(a => a.status === 'open'),
+    filter((a) => a.status === 'open'),
     orderBy(['openSince', 'lastPending', 'lastClosed'], ['desc', 'desc', 'desc']),
   )(resortData);
   const primary = pending[0] || open[0] || closed[0];
@@ -98,7 +98,7 @@ const ResortStatsCard = ({ resort, graphHeight }: Props) => {
             hidden: area !== primary,
             data: [
               ...flow(
-                map(t => ({
+                map((t) => ({
                   x: moment(t.timestamp),
                   y: t.status,
                 })),
@@ -138,21 +138,21 @@ const ResortStatsCard = ({ resort, graphHeight }: Props) => {
               const { datasets } = chart.data;
               const { length } = datasets;
               const metas = Array.from({ length }).map((x, i) => chart.getDatasetMeta(i));
-              const isHidden = i =>
+              const isHidden = (i) =>
                 metas[i].hidden == null ? datasets[i].hidden : metas[i].hidden;
               const hideStates = Array.from({ length }).map((x, i) => isHidden(i));
 
-              if (hideStates.every(h => !h)) {
+              if (hideStates.every((h) => !h)) {
                 // nothing hidden, hide all but the one clicked
                 metas.forEach((m, i) => {
                   // eslint-disable-next-line no-param-reassign
                   m.hidden = i !== index;
                 });
-              } else if (hideStates.filter(h => !h).length === 1) {
+              } else if (hideStates.filter((h) => !h).length === 1) {
                 // only one thing is currently shown
-                if (index === hideStates.findIndex(h => !h)) {
+                if (index === hideStates.findIndex((h) => !h)) {
                   // it's the one that was clicked, toggle showing all
-                  metas.forEach(m => {
+                  metas.forEach((m) => {
                     // eslint-disable-next-line no-param-reassign
                     m.hidden = false;
                   });
@@ -172,7 +172,7 @@ const ResortStatsCard = ({ resort, graphHeight }: Props) => {
       {pending.length ? (
         <div>
           <h3>pending</h3>
-          {pending.map(a => (
+          {pending.map((a) => (
             <div key={a.name}>
               {a.name}: last open {a.lastOpen ? moment(a.lastOpen).fromNow() : 'last year'}
             </div>
@@ -182,7 +182,7 @@ const ResortStatsCard = ({ resort, graphHeight }: Props) => {
       {open.length ? (
         <div>
           <h3>open</h3>
-          {open.map(a => (
+          {open.map((a) => (
             <div key={a.name}>
               {a.name}: has been open{' '}
               {a.openSince ? moment(a.openSince).fromNow(true) : 'all season'}
@@ -193,7 +193,7 @@ const ResortStatsCard = ({ resort, graphHeight }: Props) => {
       {closed.length ? (
         <div>
           <h3>closed</h3>
-          {closed.map(a => (
+          {closed.map((a) => (
             <div key={a.name}>
               {a.name}: last open {a.lastOpen ? moment(a.lastOpen).fromNow() : 'last year'}
             </div>

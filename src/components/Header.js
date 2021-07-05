@@ -3,9 +3,10 @@ import React from 'react';
 import { Navbar } from 'react-bootstrap';
 import styled from 'styled-components';
 
+import useVersion from '../hooks/useVersion';
+
 import Icon from './Icon';
 import Link from './Link';
-import useVersion from '../hooks/useVersion';
 
 const StyledNavbar = styled(Navbar)`
   && {

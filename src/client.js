@@ -1,17 +1,17 @@
 import 'whatwg-fetch';
-import React from 'react';
-import ReactDOM from 'react-dom';
-import deepForceUpdate from 'react-deep-force-update';
-import queryString from 'query-string';
 import { createPath } from 'history';
-import { CookiesProvider, Cookies } from 'react-cookie';
+import queryString from 'query-string';
+import React from 'react';
+import { Cookies, CookiesProvider } from 'react-cookie';
+import deepForceUpdate from 'react-deep-force-update';
+import ReactDOM from 'react-dom';
 
 import App from './components/App';
-import createFetch from './createFetch';
-import history from './history';
-import { updateMeta } from './DOMUtils';
-import router from './router';
 import AppContext from './contexts/AppContext';
+import createFetch from './createFetch';
+import { updateMeta } from './DOMUtils';
+import history from './history';
+import router from './router';
 
 const cookies = new Cookies();
 const customFetch = createFetch(fetch, {

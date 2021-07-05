@@ -1,17 +1,17 @@
 // @flow
-import fs from 'fs-extra';
 import {
   buildLog,
   dockerBuild,
   dockerComposeRunService,
+  type DockerContainerInfo,
   dockerImages,
   dockerTagVersion,
   getDockerId,
   getDockerRepo,
   getUniqueBuildTag,
   getVersion,
-  type DockerContainerInfo,
 } from 'build-strap';
+import fs from 'fs-extra';
 
 export async function getBuilderTag(): Promise<string> {
   return `builder-${await getUniqueBuildTag()}`;
@@ -44,12 +44,9 @@ export default async function docker(
 
   // ensure that these files exist, so that we can guarantee to stash them
   await Promise.all(
-    [
-      './latest.builder.tag',
-      './latest.builder.id',
-      './latest.build.tag',
-      './latest.build.id',
-    ].map(async f => fs.ensureFile(f)),
+    ['./latest.builder.tag', './latest.builder.id', './latest.build.tag', './latest.build.id'].map(
+      async (f) => fs.ensureFile(f),
+    ),
   );
 
   const v = await getVersion();
@@ -89,7 +86,7 @@ export async function ensureBuilder(
 ): Promise<string> {
   await fs.ensureFile('./latest.builder.tag');
   const tag = await getBuilderTag();
-  if (build || !(await dockerImages(getBuilderRepo())).find(m => m.tag === tag)) {
+  if (build || !(await dockerImages(getBuilderRepo())).find((m) => m.tag === tag)) {
     buildLog('Image does not exist, running docker build...');
     await docker(true);
   }

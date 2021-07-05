@@ -15,7 +15,7 @@
       "registry": "https://registry.yarnpkg.com/"
     },
     "docker": {
-      "repository": "lstorey/skiresorts",
+      "repository": "murrayju/skiresorts",
       "registry": "ghcr.io"
     }
   },
@@ -25,14 +25,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/lstorey/SkiResorts.git"
+    "url": "git+https://github.com/murrayju/SkiResorts.git"
   },
-  "author": "lstorey",
+  "author": "murrayju",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/lstorey/SkiResorts/issues"
+    "url": "https://github.com/murrayju/SkiResorts/issues"
   },
-  "homepage": "https://github.com/lstorey/SkiResorts#readme",
+  "homepage": "https://github.com/murrayju/SkiResorts#readme",
   "engines": {
     "node": ">=12.13.1",
     "npm": ">=6.13.4"

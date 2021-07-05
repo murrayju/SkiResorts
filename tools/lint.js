@@ -1,6 +1,6 @@
 import { run, buildLog } from 'build-strap';
 import eslint from './eslint';
-import flow from './flow';
+// import flow from './flow';
 
 // Lint the source using eslint
 export default async function lint() {
@@ -9,5 +9,5 @@ export default async function lint() {
     return;
   }
   await run(eslint);
-  await run(flow);
+  // await run(flow);
 }

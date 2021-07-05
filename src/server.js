@@ -11,7 +11,8 @@ import PrettyError from 'pretty-error';
 import { ServerStyleSheet, StyleSheetManager } from 'styled-components';
 import { renderStylesToString } from 'emotion-server';
 import bodyParser from 'body-parser';
-import type { Db } from 'mongodb';
+import type { Db, MongoClient } from 'mongodb';
+import { type CronJob } from 'cron';
 
 import { handleNodeProcessEvents, unregisterNodeProcessEvents } from './nodeProcessEvents';
 import App from './components/App';
@@ -44,7 +45,16 @@ global.navigator.userAgent = global.navigator.userAgent || 'all';
 global.navigator.platform = global.navigator.platform || 'linux';
 global.navigator.appName = global.navigator.appName || 'Chrome';
 
-const createApp = async () => {
+type AppInfo = {
+  app: express$Application<>,
+  connection: ?http$Server,
+  cronJob: CronJob,
+  db: Db,
+  mongoClient: MongoClient,
+  destroy: () => Promise<void>,
+};
+
+const createApp = async (): Promise<AppInfo> => {
   handleNodeProcessEvents();
 
   const app = express();
@@ -80,8 +90,9 @@ const createApp = async () => {
   //
   // Register server-side rendering middleware
   // -----------------------------------------------------------------------------
-  app.get('*', async (req, res, next) => {
+  app.get('*', async (req: express$Request, res: express$Response, next: express$NextFunction) => {
     try {
+      // $FlowFixMe
       const cookies = req.universalCookies;
 
       // Universal HTTP client
@@ -156,23 +167,31 @@ const createApp = async () => {
   pe.skipNodeFiles();
   pe.skipPackage('express');
 
-  // eslint-disable-next-line no-unused-vars
-  app.use((err, req, res, next) => {
-    console.error(pe.render(err));
-    const sheet = new ServerStyleSheet();
-    const innerHtml = ReactDOM.renderToString(sheet.collectStyles(<ErrorPage error={err} />));
-    const html = ReactDOM.renderToStaticMarkup(
-      <Html
-        title="Internal Server Error"
-        description={err.message}
-        styleTags={sheet.getStyleElement()}
-      >
-        {innerHtml}
-      </Html>,
-    );
-    res.status(err.status || 500);
-    res.send(`<!doctype html>${html}`);
-  });
+  // $FlowFixMe
+  app.use(
+    (
+      err,
+      req,
+      res,
+      // eslint-disable-next-line no-unused-vars
+      next,
+    ) => {
+      console.error(pe.render(err));
+      const sheet = new ServerStyleSheet();
+      const innerHtml = ReactDOM.renderToString(sheet.collectStyles(<ErrorPage error={err} />));
+      const html = ReactDOM.renderToStaticMarkup(
+        <Html
+          title="Internal Server Error"
+          description={err.message}
+          styleTags={sheet.getStyleElement()}
+        >
+          {innerHtml}
+        </Html>,
+      );
+      res.status(err.status || 500);
+      res.send(`<!doctype html>${html}`);
+    },
+  );
 
   //
   // Launch the server
@@ -193,6 +212,7 @@ const createApp = async () => {
   // -----------------------------------------------------------------------------
   // $FlowFixMe
   if (module.hot) {
+    // $FlowFixMe
     app.hot = module.hot;
     // $FlowFixMe
     module.hot.accept('./router');

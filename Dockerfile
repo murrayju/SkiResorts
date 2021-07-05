@@ -1,4 +1,4 @@
-FROM node:12 as builder
+FROM node:14 as builder
 
 ENV buildDir /opt/build
 RUN mkdir -p ${buildDir}
@@ -22,7 +22,7 @@ CMD ["server"]
 ###
 # Production image. Only include what is needed for production
 ###
-FROM node:12 as production
+FROM node:14 as production
 
 ENV appDir /opt/app
 RUN mkdir -p ${appDir}

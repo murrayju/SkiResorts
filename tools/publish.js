@@ -35,5 +35,5 @@ export default async function doPublish() {
     }
   }
   await clean(['./out/**']);
-  await run(publish, './build', './out', publishToGithub);
+  await run(publish, { distDir: './build', outDir: './out', doPublish: publishToGithub });
 }

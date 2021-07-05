@@ -6,7 +6,13 @@ import webpack from 'webpack';
 import webpackDevMiddleware from 'webpack-dev-middleware';
 import webpackHotMiddleware from 'webpack-hot-middleware';
 import errorOverlayMiddleware from 'react-dev-utils/errorOverlayMiddleware';
-import { format, onKillSignal, buildLog, dockerNetworkCreate } from 'build-strap';
+import {
+  format,
+  onKillSignal,
+  buildLog,
+  dockerNetworkCreate,
+  dockerComposeTeardown,
+} from 'build-strap';
 import fs from 'fs-extra';
 import chokidar from 'chokidar';
 
@@ -14,7 +20,7 @@ import webpackConfig from './webpack.config';
 import run from './run';
 import clean from './clean';
 import lint from './lint';
-import { runDbContainer, dockerTeardown } from './docker';
+import { runDbContainer } from './docker';
 
 const isDebug = !process.argv.includes('--release');
 
@@ -75,7 +81,7 @@ async function start(
         cleaning = (async () => {
           buildLog('Process exiting... cleaning up...');
           cfgWatcher?.close();
-          await dockerTeardown();
+          await dockerComposeTeardown();
           buildLog('Cleanup finished.');
           outerResolve();
           // process.exit();
@@ -162,7 +168,7 @@ async function start(
         delete require.cache[require.resolve('config')];
         delete require.cache[require.resolve('@murrayju/config')];
         delete require.cache[require.resolve('../build/server')];
-        // eslint-disable-next-line global-require, import/no-unresolved
+        // eslint-disable-next-line global-require, import/no-unresolved, import/extensions
         ({ app, destroy } = await require('../build/server').default());
         console.warn(`${hmrPrefix}App has been reloaded.`);
       };
@@ -231,7 +237,7 @@ async function start(
       console.info(`[${format(timeStart)}] Launching server...`);
 
       // Load compiled src/server.js as a middleware
-      // eslint-disable-next-line global-require, import/no-unresolved
+      // eslint-disable-next-line global-require, import/no-unresolved, import/extensions
       ({ app, destroy } = await require('../build/server').default());
       appPromiseIsResolved = true;
       appPromiseResolve();

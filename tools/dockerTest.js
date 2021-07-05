@@ -1,7 +1,7 @@
 // @flow
 import path from 'path';
-import { buildLog, dockerRun } from 'build-strap';
-import { getBuilderImage, ensureBuilder, dockerTeardown } from './docker';
+import { buildLog, dockerContainerRun, dockerComposeTeardown } from 'build-strap';
+import { getBuilderImage, ensureBuilder } from './docker';
 
 // Run automated tests within the docker container
 export default async function dockerTest(
@@ -15,8 +15,8 @@ export default async function dockerTest(
   const network = `ski-resorts-test-integration-${tag}`;
   try {
     // Run the tests in the builder container
-    await dockerRun(
-      [
+    await dockerContainerRun({
+      runArgs: [
         '--rm',
         ...(interactive ? ['-it'] : []),
         ...(integration ? [`--network=${network}`] : []),
@@ -24,19 +24,19 @@ export default async function dockerTest(
           ? ['-v', `${path.resolve('./config')}:/opt/build/config`]
           : []),
       ],
-      await getBuilderImage(tag),
-      [
+      image: await getBuilderImage(tag),
+      cmd: [
         'test',
         '--test-only',
         '--test-no-dockerize-deps',
         ...(integration ? ['--test-integration'] : []),
       ],
-    );
+    });
   } finally {
     // cleanup
     if (integration) {
       buildLog('Cleaning up docker containers...');
-      await dockerTeardown();
+      await dockerComposeTeardown();
       buildLog('Cleanup complete!');
     }
   }

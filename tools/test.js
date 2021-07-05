@@ -1,9 +1,8 @@
 import path from 'path';
 import fs from 'fs-extra';
 import getPort from 'get-port';
-import { buildLog, run, spawn, onKillSignal } from 'build-strap';
+import { buildLog, run, spawn, onKillSignal, dockerComposeTeardown } from 'build-strap';
 import build from './build';
-import { dockerTeardown } from './docker';
 
 // Run tests in Mocha
 export default async function test(
@@ -25,7 +24,7 @@ export default async function test(
   }
 
   if (integration && dockerizeDeps) {
-    onKillSignal(() => dockerTeardown());
+    onKillSignal(() => dockerComposeTeardown());
   }
   try {
     await spawn(
@@ -60,13 +59,13 @@ export default async function test(
       buildLog('Tests interrupted by SIGTERM');
     }
     if (integration && dockerizeDeps) {
-      await dockerTeardown();
+      await dockerComposeTeardown();
     }
     if (!ignoreFailures || sigint || sigterm) {
       throw err;
     }
   }
   if (integration && dockerizeDeps) {
-    await dockerTeardown();
+    await dockerComposeTeardown();
   }
 }

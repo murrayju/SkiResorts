@@ -10,7 +10,7 @@ import logger from '../logger';
 import { entries } from '../util/maps';
 import type { ServerContext } from '../server';
 
-export const createScraperCron = ({ db, emitter }: ServerContext) => {
+export const createScraperCron = ({ db, emitter }: ServerContext): CronJob => {
   const recordData = async () => {
     if (!config.get('scraper.enabled')) {
       logger.debug('scraper disabled, skipping');

@@ -16,7 +16,7 @@
     },
     "docker": {
       "repository": "lstorey/skiresorts",
-      "registry": "docker.pkg.github.com"
+      "registry": "ghcr.io"
     }
   },
   "scripts": {

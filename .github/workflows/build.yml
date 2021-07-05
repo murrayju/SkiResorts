@@ -18,3 +18,15 @@ jobs:
       env:
         ARTIFACTORY_USER: ${{ github.actor }}
         ARTIFACTORY_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
+    - name: Docker deploy via SSH
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.DEPLOY_HOST }}
+        username: ${{ secrets.DEPLOY_USER }}
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        port: ${{ secrets.DEPLOY_PORT }}
+        script: |
+          docker login ghcr.io -u ${{ github.actor }} -p ${{ secrets.GITHUB_TOKEN }}
+          cd ${{ secrets.DEPLOY_DIR }}
+          docker-compose pull
+          docker-compose up -d

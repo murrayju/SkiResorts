@@ -13,6 +13,8 @@ services:
       - ./src:/opt/build/src:rw
       - ./config:/opt/build/config:rw
       - ./package.json:/opt/build/package.json:ro
+    networks:
+      - backend
     command: ["tdd", "--poll-fs", "--tdd-no-docker"]
     links:
       - db
@@ -22,9 +24,15 @@ services:
       - 27018:27017
     volumes:
       - db:/data/db:rw
+    networks:
+      - backend
     # environment:
     #   MONGO_INITDB_ROOT_USERNAME: test
     #   MONGO_INITDB_ROOT_PASSWORD: testPass
 
 volumes:
   db:
+
+networks:
+  backend:
+    name: ski-resorts-net

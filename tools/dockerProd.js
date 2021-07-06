@@ -26,7 +26,7 @@ export default async function dockerProd(
     await run(docker);
   }
 
-  const network = 'ski-resorts-production';
+  const network = 'ski-resorts-net';
   let db = null;
   let dbHost = null;
   let dbPort = null;

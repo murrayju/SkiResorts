@@ -1,18 +1,11 @@
 module.exports = {
-  presets: [
-    [
-      '@babel/preset-env',
-      {
-        useBuiltIns: 'usage',
-        corejs: { version: '3.15', proposals: true },
-      },
-    ],
-    '@babel/preset-react',
-    '@babel/preset-flow',
-  ],
+  targets: 'defaults, not ie <= 11',
+  presets: ['@babel/preset-env', '@babel/preset-react', '@babel/preset-flow'],
   sourceMaps: 'inline',
   retainLines: true,
   plugins: [
+    ['polyfill-corejs3', { method: 'usage-global' }],
+    ['polyfill-regenerator', { method: 'usage-global' }],
     '@babel/plugin-syntax-dynamic-import',
     '@babel/plugin-syntax-import-meta',
     '@babel/plugin-proposal-class-properties',
